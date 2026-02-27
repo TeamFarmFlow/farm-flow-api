@@ -9,6 +9,7 @@ import com.example.app.user.domain.User;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +29,7 @@ public class JwtTokenIssuer {
     return refreshTokenRepository.findValidByIdWithUser(refreshTokenId);
   }
 
+  @Transactional
   public void revokeRefreshToken(String refreshTokenId) {
     refreshTokenRepository.deleteById(refreshTokenId);
   }

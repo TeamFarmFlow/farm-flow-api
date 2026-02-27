@@ -4,9 +4,9 @@ import com.example.app.auth.application.result.AuthResult;
 import com.example.app.auth.application.result.AuthUser;
 import com.example.app.auth.domain.exception.InvalidTokenException;
 import com.example.app.auth.infrastructure.jwt.JwtTokenIssuer;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
