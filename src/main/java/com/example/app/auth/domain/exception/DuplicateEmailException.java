@@ -1,4 +1,4 @@
-package com.example.app.user.domain.exception;
+package com.example.app.auth.domain.exception;
 
 import com.example.app.core.exception.DomainException;
 import org.springframework.http.HttpStatus;

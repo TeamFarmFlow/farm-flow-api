@@ -1,8 +1,8 @@
 package com.example.app.user.application;
 
 import com.example.app.user.domain.enums.UserType;
-import com.example.app.user.domain.exception.DuplicateEmailException;
-import com.example.app.user.presentation.dto.request.UserSignUpRequest;
+import com.example.app.auth.domain.exception.DuplicateEmailException;
+import com.example.app.auth.presentation.dto.request.SignUpRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -24,26 +24,17 @@ public class UserService {
     return userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
   }
 
-  /**
-   * 회원 가입(농장주)
-   */
+  public Boolean hasUserByEmail(String email) {
+    return userRepository.existsByEmail(email);
+  }
+
   @Transactional
-  public Long signUp(UserSignUpRequest request) {
-
-    if (userRepository.existsByEmail(request.getEmail())) {
-      throw new DuplicateEmailException(request.getEmail());
-    }
-
-    String encodedPassword = passwordEncoder.encode(request.getPassword());
-
-    User user = User.builder()
-            .email(request.getEmail())
-            .password(encodedPassword)
-            .name(request.getUserName())
-            .type(UserType.EMPLOYEE)
-            .build();
-    userRepository.save(user);
-
-    return user.getId();
+  public User saveUser(UserType type, String email, String name, String password) {
+    return userRepository.save(User.builder()
+            .type(type)
+            .email(email)
+            .name(name)
+            .password(passwordEncoder.encode(password))
+            .build());
   }
 }
