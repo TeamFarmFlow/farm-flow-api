@@ -1,35 +1,35 @@
 package com.example.app.user.domain;
 
-import java.time.LocalDateTime;
+import com.example.app.core.entity.BaseTimeEntity;
 
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.example.app.user.domain.enums.UserType;
+import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+@Entity
 @Getter
-@Entity(name = "users")
-public class User {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "users")
+public class User extends BaseTimeEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @Column(length = 50, nullable = false)
-  private String name;
+  @Column(length = 120, nullable = false, unique = true)
+  private String email;
 
   @Column(length = 255, nullable = false)
   private String password;
 
-  @CreatedDate
-  @Column(nullable = false, updatable = false)
-  private LocalDateTime createdAt;
+  @Column(length = 50, nullable = false)
+  private String name;
 
-  @LastModifiedDate
+  @Enumerated(EnumType.STRING)
   @Column(nullable = false)
-  private LocalDateTime updatedAt;
+  private UserType type;
+
+  @Column(nullable = false)
+  private boolean isActive = true;
 }
