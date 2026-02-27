@@ -2,7 +2,6 @@ package com.example.app.farm.domain;
 
 import com.example.app.core.entity.BaseTimeEntity;
 import com.example.app.user.domain.User;
-
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -19,8 +18,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "farm_users")
 public class FarmUser extends BaseTimeEntity {
-  @EmbeddedId
-  private FarmUserId id;
+  @EmbeddedId private FarmUserId id;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @MapsId("farmId")

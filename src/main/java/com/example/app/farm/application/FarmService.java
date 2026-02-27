@@ -1,10 +1,8 @@
 package com.example.app.farm.application;
 
-import org.springframework.stereotype.Service;
-
 import com.example.app.farm.domain.FarmRepository;
-
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor

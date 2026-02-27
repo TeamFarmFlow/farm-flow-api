@@ -14,18 +14,17 @@ public class OpenApiConfiguration {
   OpenAPI openAPI() {
     String jwt = "JWT";
     SecurityRequirement securityRequirement = new SecurityRequirement().addList(jwt);
-    SecurityScheme securityScheme = new SecurityScheme()
-        .name(jwt)
-        .type(SecurityScheme.Type.HTTP)
-        .scheme("bearer")
-        .bearerFormat(jwt);
+    SecurityScheme securityScheme =
+        new SecurityScheme()
+            .name(jwt)
+            .type(SecurityScheme.Type.HTTP)
+            .scheme("bearer")
+            .bearerFormat(jwt);
 
     Components securityComponents = new Components().addSecuritySchemes(jwt, securityScheme);
 
-    Info info = new Info()
-        .title("FarmFlow API")
-        .description("Farm Flow API Document")
-        .version("1.0.0");
+    Info info =
+        new Info().title("FarmFlow API").description("Farm Flow API Document").version("1.0.0");
 
     return new OpenAPI()
         .info(info)

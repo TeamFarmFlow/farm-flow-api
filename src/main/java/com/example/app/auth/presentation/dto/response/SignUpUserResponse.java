@@ -1,6 +1,6 @@
 package com.example.app.auth.presentation.dto.response;
 
-import com.example.app.auth.application.signup.SignUpUserResult;
+import com.example.app.auth.application.signup.result.SignUpUserResult;
 
 public record SignUpUserResponse(
     Long id,

@@ -1,12 +1,11 @@
 package com.example.app.user.domain;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.example.app.core.entity.BaseTimeEntity;
 import com.example.app.farm.domain.FarmUser;
 import com.example.app.user.domain.enums.UserType;
 import jakarta.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.*;
 
 @Entity

@@ -1,12 +1,6 @@
 package com.example.app.auth.domain;
 
-import java.time.LocalDateTime;
-
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
 import com.example.app.user.domain.User;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
@@ -17,11 +11,14 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
 @Getter
@@ -43,7 +40,10 @@ public class RefreshToken {
   @Column(name = "created_at", nullable = false, updatable = false)
   private LocalDateTime createdAt;
 
-  @Column(name = "expired_at", nullable = false, columnDefinition = "DATETIME NOT NULL DEFAULT (CURRENT_TIMESTAMP + INTERVAL 20 DAY)")
+  @Column(
+      name = "expired_at",
+      nullable = false,
+      columnDefinition = "DATETIME NOT NULL DEFAULT (CURRENT_TIMESTAMP + INTERVAL 20 DAY)")
   private LocalDateTime expiredAt;
 
   public static RefreshToken issue(Long userId) {

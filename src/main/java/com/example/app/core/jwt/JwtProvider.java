@@ -1,19 +1,15 @@
 package com.example.app.core.jwt;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Date;
-
-import javax.crypto.SecretKey;
-
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-
 import com.example.app.user.domain.User;
-
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import java.nio.charset.StandardCharsets;
+import java.util.Date;
+import javax.crypto.SecretKey;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 @Component
 public class JwtProvider {
@@ -36,25 +32,22 @@ public class JwtProvider {
     Date now = new Date();
     Date expiration = new Date(now.getTime() + accessTokenExpireMs);
 
-    String token = Jwts.builder()
-        .subject(claim.getEmail())
-        .claim("id", claim.getId())
-        .claim("email", claim.getEmail())
-        .claim("type", claim.getType().name())
-        .issuedAt(now)
-        .expiration(expiration)
-        .signWith(secretKey)
-        .compact();
+    String token =
+        Jwts.builder()
+            .subject(claim.getEmail())
+            .claim("id", claim.getId())
+            .claim("email", claim.getEmail())
+            .claim("type", claim.getType().name())
+            .issuedAt(now)
+            .expiration(expiration)
+            .signWith(secretKey)
+            .compact();
 
     return IssueAccessTokenResult.from(token, expiration);
   }
 
   public Claims parseClaims(String token) {
-    return Jwts.parser()
-        .verifyWith(secretKey)
-        .build()
-        .parseSignedClaims(token)
-        .getPayload();
+    return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload();
   }
 
   public boolean validate(String token) {

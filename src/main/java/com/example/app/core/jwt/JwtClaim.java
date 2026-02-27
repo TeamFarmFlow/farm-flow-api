@@ -2,7 +2,6 @@ package com.example.app.core.jwt;
 
 import com.example.app.user.domain.User;
 import com.example.app.user.domain.enums.UserType;
-
 import io.jsonwebtoken.Claims;
 import lombok.Getter;
 

@@ -9,8 +9,10 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class GloablPrefixConfiguration implements WebMvcConfigurer {
   @Override
   public void configurePathMatch(PathMatchConfigurer configurer) {
-    configurer.addPathPrefix("api/v1",
-        cls -> cls.isAnnotationPresent(RestController.class)
-            && cls.getPackageName().startsWith("com.example.app"));
+    configurer.addPathPrefix(
+        "api/v1",
+        cls ->
+            cls.isAnnotationPresent(RestController.class)
+                && cls.getPackageName().startsWith("com.example.app"));
   }
 }

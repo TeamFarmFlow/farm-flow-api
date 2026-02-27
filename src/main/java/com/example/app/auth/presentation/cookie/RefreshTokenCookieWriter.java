@@ -1,14 +1,12 @@
 package com.example.app.auth.presentation.cookie;
 
+import jakarta.servlet.http.HttpServletResponse;
 import java.time.Duration;
-
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
-
-import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
 
 @Component
 @EnableConfigurationProperties(RefreshCookieProperties.class)

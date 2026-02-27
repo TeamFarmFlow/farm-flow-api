@@ -5,6 +5,4 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("farms")
-public class FarmController {
-
-}
+public class FarmController {}

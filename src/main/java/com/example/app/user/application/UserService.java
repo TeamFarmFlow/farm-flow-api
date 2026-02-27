@@ -1,16 +1,12 @@
 package com.example.app.user.application;
 
-import com.example.app.user.domain.enums.UserType;
-import com.example.app.auth.domain.exception.DuplicateEmailException;
-import com.example.app.auth.presentation.dto.request.SignUpRequest;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-
 import com.example.app.user.domain.User;
 import com.example.app.user.domain.UserRepository;
+import com.example.app.user.domain.enums.UserType;
 import com.example.app.user.domain.exception.UserNotFoundException;
-
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -30,7 +26,8 @@ public class UserService {
 
   @Transactional
   public User saveUser(UserType type, String email, String name, String password) {
-    return userRepository.save(User.builder()
+    return userRepository.save(
+        User.builder()
             .type(type)
             .email(email)
             .name(name)

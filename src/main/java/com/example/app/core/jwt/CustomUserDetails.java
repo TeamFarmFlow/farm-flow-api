@@ -1,14 +1,11 @@
 package com.example.app.core.jwt;
 
+import com.example.app.user.domain.enums.UserType;
 import java.util.Collection;
 import java.util.List;
-
+import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-
-import com.example.app.user.domain.enums.UserType;
-
-import lombok.Getter;
 
 @Getter
 public class CustomUserDetails implements UserDetails {

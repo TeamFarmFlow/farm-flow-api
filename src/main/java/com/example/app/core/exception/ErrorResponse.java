@@ -1,10 +1,8 @@
 package com.example.app.core.exception;
 
 import java.time.Instant;
-
-import org.springframework.http.HttpStatus;
-
 import lombok.Getter;
+import org.springframework.http.HttpStatus;
 
 @Getter
 public class ErrorResponse {

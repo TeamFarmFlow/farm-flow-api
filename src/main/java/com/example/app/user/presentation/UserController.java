@@ -1,14 +1,12 @@
 package com.example.app.user.presentation;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.web.bind.annotation.*;
-
 import com.example.app.user.application.UserService;
 import com.example.app.user.domain.User;
 import com.example.app.user.presentation.dto.response.UserResponse;
-
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("users")
