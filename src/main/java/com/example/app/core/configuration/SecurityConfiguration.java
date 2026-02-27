@@ -1,6 +1,10 @@
-package com.example.app.core.security;
+package com.example.app.core.configuration;
 
 import lombok.RequiredArgsConstructor;
+
+import java.util.List;
+
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -8,16 +12,25 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import com.example.app.core.security.SecurityAuthenticationEntryPoint;
 
 @Configuration
+@EnableConfigurationProperties(CorsProperties.class)
 @RequiredArgsConstructor
 public class SecurityConfiguration {
   private final SecurityAuthenticationEntryPoint authenticationEntryPoint;
+  private final CorsProperties corsProperties;
 
   @Bean
   SecurityFilterChain filterChain(HttpSecurity http) {
     return http
         .csrf(csrf -> csrf.disable())
+        .cors(cors -> {
+        })
         .sessionManagement(
             sessionMenagement -> sessionMenagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .exceptionHandling(eh -> eh.authenticationEntryPoint(authenticationEntryPoint))
@@ -32,5 +45,20 @@ public class SecurityConfiguration {
   @Bean
   PasswordEncoder passwordEncoder() {
     return new BCryptPasswordEncoder();
+  }
+
+  @Bean
+  CorsConfigurationSource corsConfigurationSource() {
+    CorsConfiguration config = new CorsConfiguration();
+
+    config.setAllowedOriginPatterns(corsProperties.getAllowedOriginPatterns());
+    config.setAllowedMethods(List.of("*"));
+    config.setAllowedHeaders(List.of("*"));
+    config.setAllowCredentials(true);
+
+    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+    source.registerCorsConfiguration("/**", config);
+
+    return source;
   }
 }
