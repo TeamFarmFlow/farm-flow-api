@@ -62,8 +62,18 @@ tasks.named('asciidoctor') {
 	dependsOn test
 }
 
+tasks.register("installGitHooks", Copy) {
+	from(file(".githooks"))
+	into(file(".git/hooks"))
+	fileMode = 0775
+}
+
+tasks.named("build") {
+	dependsOn("installGitHooks")
+}
+
 spotless {
-    java {
-        googleJavaFormat()
-    }
+	java {
+		googleJavaFormat()
+	}
 }

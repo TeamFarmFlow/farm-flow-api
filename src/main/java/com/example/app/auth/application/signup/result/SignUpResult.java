@@ -7,5 +7,4 @@ public record SignUpResult(
     String accessToken,
     Instant expiresAt,
     long expiresIn,
-    SignUpUserResult user) {
-}
+    SignUpUserResult user) {}
