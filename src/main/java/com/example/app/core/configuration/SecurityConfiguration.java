@@ -40,7 +40,7 @@ public class SecurityConfiguration {
         .exceptionHandling(eh -> eh.authenticationEntryPoint(authenticationEntryPoint))
         .authorizeHttpRequests(
             auth -> auth
-                .requestMatchers("/api/v1", "/api/v1/", "/api/v1/auth/**").permitAll()
+                .requestMatchers("/api/v1", "/api/v1/", "/api/v1/auth/**", "/api/v1/users/signUp").permitAll()
                 .requestMatchers("/api/v1/**").authenticated()
                 .anyRequest().permitAll())
         .addFilterBefore(new JwtFilter(jwtProvider, authenticationEntryPoint),
