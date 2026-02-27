@@ -1,4 +1,4 @@
-package com.example.app.configuration;
+package com.example.app.core.security;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -12,6 +12,7 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfiguration {
+  private final SecurityAuthenticationEntryPoint authenticationEntryPoint;
 
   @Bean
   SecurityFilterChain filterChain(HttpSecurity http) {
@@ -19,6 +20,7 @@ public class SecurityConfiguration {
         .csrf(csrf -> csrf.disable())
         .sessionManagement(
             sessionMenagement -> sessionMenagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        .exceptionHandling(eh -> eh.authenticationEntryPoint(authenticationEntryPoint))
         .authorizeHttpRequests(
             auth -> auth
                 .requestMatchers("/api/v1", "/api/v1/", "/api/v1/auth/**").permitAll()
