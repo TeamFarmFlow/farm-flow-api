@@ -10,13 +10,13 @@ import lombok.Getter;
 public class ErrorResponse {
   private final String errorCode;
   private final String message;
-  private final HttpStatus statusCode;
+  private final Integer statusCode;
   private final Instant timestamp;
 
   public ErrorResponse(String errorCode, String message, HttpStatus statusCode, Instant timestamp) {
     this.errorCode = errorCode;
     this.message = message;
-    this.statusCode = statusCode;
+    this.statusCode = statusCode.value();
     this.timestamp = timestamp;
   }
 
