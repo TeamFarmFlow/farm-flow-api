@@ -16,15 +16,14 @@ import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 public class SecurityConfiguration {
 
   @Bean
-  public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-
+  SecurityFilterChain filterChain(HttpSecurity http) {
     return http
         .csrf(csrf -> csrf.disable())
         .sessionManagement(
             sessionMenagement -> sessionMenagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(auth -> auth
+            .requestMatchers("/api/v1/v3/api-docs/**", "/swagger-ui/**").permitAll()
             .requestMatchers("/api/v1", "/api/v1/", "/api/v1/auth/**").permitAll()
-            .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
             .anyRequest().authenticated())
         .exceptionHandling(
             e -> e.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
@@ -32,7 +31,7 @@ public class SecurityConfiguration {
   }
 
   @Bean
-  public PasswordEncoder passwordEncoder() {
+  PasswordEncoder passwordEncoder() {
     return new BCryptPasswordEncoder();
   }
 }
