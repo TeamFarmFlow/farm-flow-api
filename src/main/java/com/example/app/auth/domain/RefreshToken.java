@@ -12,7 +12,7 @@ import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -45,19 +45,19 @@ public class RefreshToken {
 
   @CreatedDate
   @Column(name = "created_at", nullable = false, updatable = false)
-  private LocalDateTime createdAt;
+  private Instant createdAt;
 
   @Column(
       name = "expired_at",
       nullable = false,
       columnDefinition = "DATETIME NOT NULL DEFAULT (CURRENT_TIMESTAMP + INTERVAL 20 DAY)")
-  private LocalDateTime expiredAt;
+  private Instant expiredAt;
 
   public static RefreshToken issue(Long userId) {
     RefreshToken refreshToken = new RefreshToken();
 
     refreshToken.user = User.builder().id(userId).build();
-    refreshToken.expiredAt = LocalDateTime.now().plusDays(20);
+    refreshToken.expiredAt = Instant.now().plusSeconds(20 * 24 * 60 * 60);
 
     return refreshToken;
   }

@@ -7,7 +7,7 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: password
       MYSQL_DATABASE: farm-flow
-      TZ: Asia/Seoul
+      TZ: UTC
     volumes:
       - .docker/mysql/initdb.d:/docker-entrypoint-initdb.d
       - .docker/mysql/data:/var/lib/mysql

@@ -2,11 +2,11 @@ package com.example.app.auth.presentation;
 
 import com.example.app.auth.application.LoginService;
 import com.example.app.auth.application.RefreshTokenService;
-import com.example.app.auth.application.SignUpService;
+import com.example.app.auth.application.RegisterService;
 import com.example.app.auth.infrastructure.cookie.RefreshTokenCookieParser;
 import com.example.app.auth.infrastructure.cookie.RefreshTokenCookieWriter;
 import com.example.app.auth.presentation.dto.request.LoginRequest;
-import com.example.app.auth.presentation.dto.request.SignUpRequest;
+import com.example.app.auth.presentation.dto.request.RegisterRequest;
 import com.example.app.auth.presentation.dto.response.AuthResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -27,21 +27,21 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
   private final RefreshTokenCookieWriter refreshTokenCookieWriter;
   private final RefreshTokenCookieParser refreshTokenCookieParser;
-  private final SignUpService signUpService;
+  private final RegisterService registerService;
   private final LoginService loginService;
   private final RefreshTokenService refreshTokenService;
 
-  @Operation(summary = "회원가입")
-  @PostMapping("/signup")
-  public ResponseEntity<AuthResponse> signUp(
-      @Valid @RequestBody SignUpRequest request, HttpServletResponse response) {
-    var result = signUpService.signUp(request.toCommand());
+  @Operation(summary = "회원가입(농장주)")
+  @PostMapping("register")
+  public ResponseEntity<AuthResponse> register(
+      @Valid @RequestBody RegisterRequest request, HttpServletResponse response) {
+    var result = registerService.register(request.toCommand());
     refreshTokenCookieWriter.set(response, result.refreshToken());
     return ResponseEntity.ok(AuthResponse.from(result));
   }
 
   @Operation(summary = "로그인")
-  @PostMapping("/login")
+  @PostMapping("login")
   public ResponseEntity<AuthResponse> login(
       @Valid @RequestBody LoginRequest request, HttpServletResponse response) {
     var result = loginService.login(request.toCommand());
@@ -50,7 +50,7 @@ public class AuthController {
   }
 
   @Operation(summary = "토큰 갱신")
-  @PostMapping("/refresh")
+  @PostMapping("refresh")
   public ResponseEntity<AuthResponse> refreshToken(
       HttpServletRequest request, HttpServletResponse response) {
     var result = refreshTokenService.refreshToken(refreshTokenCookieParser.parse(request));

@@ -2,6 +2,7 @@ package com.example.app.user.domain;
 
 import com.example.app.core.entity.BaseTimeEntity;
 import com.example.app.farm.domain.FarmUser;
+import com.example.app.user.domain.enums.UserStatus;
 import com.example.app.user.domain.enums.UserType;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -13,6 +14,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
@@ -20,7 +22,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Entity
 @Getter
@@ -43,8 +44,12 @@ public class User extends BaseTimeEntity {
   private String name;
 
   @Enumerated(EnumType.STRING)
-  @Column(nullable = false)
+  @Column(nullable = false, columnDefinition = "VARCHAR(20) NOT NULL")
   private UserType type;
+
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false, columnDefinition = "VARCHAR(20) NOT NULL")
+  private UserStatus status;
 
   @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT TRUE")
   private boolean isActive;
@@ -52,7 +57,6 @@ public class User extends BaseTimeEntity {
   @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
   private final List<FarmUser> farmUsers = new ArrayList<>();
 
-  public boolean isMatchingPassword(String rawPassword, PasswordEncoder passwordEncoder) {
-    return passwordEncoder.matches(rawPassword, this.password);
-  }
+  @Column(nullable = true)
+  private Instant deletedAt;
 }

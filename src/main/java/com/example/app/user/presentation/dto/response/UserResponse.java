@@ -1,6 +1,6 @@
 package com.example.app.user.presentation.dto.response;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,6 +11,6 @@ import lombok.Setter;
 public class UserResponse {
   private Long id;
   private String name;
-  private LocalDateTime createdAt;
-  private LocalDateTime updatedAt;
+  private Instant createdAt;
+  private Instant updatedAt;
 }

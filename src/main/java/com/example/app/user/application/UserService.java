@@ -2,6 +2,7 @@ package com.example.app.user.application;
 
 import com.example.app.user.domain.User;
 import com.example.app.user.domain.UserRepository;
+import com.example.app.user.domain.enums.UserStatus;
 import com.example.app.user.domain.enums.UserType;
 import com.example.app.user.domain.exception.UserNotFoundException;
 import java.util.Optional;
@@ -41,6 +42,7 @@ public class UserService {
             .email(email)
             .name(name)
             .password(passwordEncoder.encode(password))
+            .status(UserStatus.ACTIVE)
             .build());
   }
 }
