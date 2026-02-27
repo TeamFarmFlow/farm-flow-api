@@ -6,9 +6,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @EnableJpaAuditing
 @SpringBootApplication
-public class FarmFlowApplication {
+public class Application {
 
 	public static void main(String[] args) {
-		SpringApplication.run(FarmFlowApplication.class, args);
+		SpringApplication.run(Application.class, args);
 	}
 }

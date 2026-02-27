@@ -1,10 +1,10 @@
-package com.example.FarmFlow;
+package com.example.app;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class FarmFlowApplicationTests {
+class ApplicationTests {
 
 	@Test
 	void contextLoads() {
