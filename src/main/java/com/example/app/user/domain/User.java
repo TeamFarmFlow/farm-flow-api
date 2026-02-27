@@ -3,10 +3,24 @@ package com.example.app.user.domain;
 import com.example.app.core.entity.BaseTimeEntity;
 import com.example.app.farm.domain.FarmUser;
 import com.example.app.user.domain.enums.UserType;
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Entity
 @Getter
@@ -37,4 +51,8 @@ public class User extends BaseTimeEntity {
 
   @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
   private final List<FarmUser> farmUsers = new ArrayList<>();
+
+  public boolean isMatchingPassword(String rawPassword, PasswordEncoder passwordEncoder) {
+    return passwordEncoder.matches(rawPassword, this.password);
+  }
 }

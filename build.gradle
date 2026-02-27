@@ -74,6 +74,9 @@ tasks.named("build") {
 
 spotless {
 	java {
-		googleJavaFormat()
+		googleJavaFormat('1.17.0')
+		removeUnusedImports()
+		trimTrailingWhitespace()
+		endWithNewline()
 	}
 }

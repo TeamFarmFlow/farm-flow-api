@@ -4,6 +4,7 @@ import com.example.app.user.domain.User;
 import com.example.app.user.domain.UserRepository;
 import com.example.app.user.domain.enums.UserType;
 import com.example.app.user.domain.exception.UserNotFoundException;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -16,8 +17,16 @@ public class UserService {
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
 
+  public boolean isMatchPassword(User user, String password) {
+    return passwordEncoder.matches(password, user.getPassword());
+  }
+
   public User getUserById(Long id) {
     return userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
+  }
+
+  public Optional<User> getUserByEmail(String email) {
+    return userRepository.findByEmail(email);
   }
 
   public Boolean hasUserByEmail(String email) {

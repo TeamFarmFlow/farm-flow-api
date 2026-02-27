@@ -1,13 +1,11 @@
-package com.example.app.auth.application.signup;
+package com.example.app.auth.application;
 
-import com.example.app.auth.application.signup.command.SignUpCommand;
-import com.example.app.auth.application.signup.result.SignUpResult;
-import com.example.app.auth.application.signup.result.SignUpUserResult;
+import com.example.app.auth.application.command.SignUpCommand;
+import com.example.app.auth.application.result.AuthResult;
+import com.example.app.auth.application.result.AuthUser;
 import com.example.app.auth.domain.exception.DuplicateEmailException;
 import com.example.app.auth.infrastructure.jwt.JwtTokenIssuer;
-import com.example.app.core.jwt.IssueAccessTokenResult;
 import com.example.app.user.application.UserService;
-import com.example.app.user.domain.User;
 import com.example.app.user.domain.enums.UserType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,25 +18,22 @@ public class SignUpService {
   private final UserService userService;
 
   @Transactional
-  public SignUpResult signUp(SignUpCommand command) {
+  public AuthResult signUp(SignUpCommand command) {
     if (Boolean.TRUE.equals(userService.hasUserByEmail(command.email()))) {
       throw new DuplicateEmailException(command.email());
     }
 
-    User user =
+    var user =
         userService.saveUser(
             UserType.EMPLOYER, command.email(), command.name(), command.password());
+    var issueAccessTokenResult = jwtTokenIssuer.issueAccessToken(user);
+    var refreshToken = jwtTokenIssuer.issueRefreshToken(user.getId());
 
-    IssueAccessTokenResult issueAccessTokenResult = jwtTokenIssuer.issueAccessToken(user);
-    SignUpUserResult signUpUserResult = SignUpUserResult.from(user);
-
-    String refreshToken = jwtTokenIssuer.issueRefreshToken(user.getId());
-
-    return new SignUpResult(
+    return new AuthResult(
         refreshToken,
         issueAccessTokenResult.accessToken(),
         issueAccessTokenResult.expiresAt(),
         issueAccessTokenResult.expiresIn(),
-        signUpUserResult);
+        AuthUser.from(user));
   }
 }
