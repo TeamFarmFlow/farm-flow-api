@@ -24,6 +24,5 @@ spring:
       ddl-auto: update
 
 jwt:
-  access:
-    secret: dHJvdWJsZXNvbWUtYWRtaW4tYXBpLXNlcnZlci1qc29ud2VidG9rZW4tYWNjZXNzLXRva2VuLXNlY3JldA==
-    expiration-seconds: 86400
+  secret: dHJvdWJsZXNvbWUtYWRtaW4tYXBpLXNlcnZlci1qc29ud2VidG9rZW4tYWNjZXNzLXRva2VuLXNlY3JldA==
+  expiration-seconds: 86400

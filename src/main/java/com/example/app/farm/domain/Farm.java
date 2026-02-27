@@ -1,17 +1,13 @@
-package com.example.app.user.domain;
+package com.example.app.farm.domain;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import com.example.app.core.entity.BaseTimeEntity;
-import com.example.app.farm.domain.FarmUser;
-import com.example.app.user.domain.enums.UserType;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -24,28 +20,15 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "users")
-public class User extends BaseTimeEntity {
+@Table(name = "farms")
+public class Farm extends BaseTimeEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
   @Column(length = 120, nullable = false, unique = true)
-  private String email;
-
-  @Column(length = 255, nullable = false)
-  private String password;
-
-  @Column(length = 50, nullable = false)
   private String name;
 
-  @Enumerated(EnumType.STRING)
-  @Column(nullable = false)
-  private UserType type;
-
-  @Column(nullable = false)
-  private boolean isActive = true;
-
-  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(mappedBy = "farm", cascade = CascadeType.ALL, orphanRemoval = true)
   private final List<FarmUser> farmUsers = new ArrayList<>();
 }

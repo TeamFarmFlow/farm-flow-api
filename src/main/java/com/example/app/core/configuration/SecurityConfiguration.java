@@ -1,7 +1,5 @@
 package com.example.app.core.configuration;
 
-import lombok.RequiredArgsConstructor;
-
 import java.util.List;
 
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -12,11 +10,16 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import com.example.app.core.jwt.JwtFilter;
+import com.example.app.core.jwt.JwtProvider;
 import com.example.app.core.security.SecurityAuthenticationEntryPoint;
+
+import lombok.RequiredArgsConstructor;
 
 @Configuration
 @EnableConfigurationProperties(CorsProperties.class)
@@ -24,6 +27,7 @@ import com.example.app.core.security.SecurityAuthenticationEntryPoint;
 public class SecurityConfiguration {
   private final SecurityAuthenticationEntryPoint authenticationEntryPoint;
   private final CorsProperties corsProperties;
+  private final JwtProvider jwtProvider;
 
   @Bean
   SecurityFilterChain filterChain(HttpSecurity http) {
@@ -39,6 +43,8 @@ public class SecurityConfiguration {
                 .requestMatchers("/api/v1", "/api/v1/", "/api/v1/auth/**").permitAll()
                 .requestMatchers("/api/v1/**").authenticated()
                 .anyRequest().permitAll())
+        .addFilterBefore(new JwtFilter(jwtProvider, authenticationEntryPoint),
+            UsernamePasswordAuthenticationFilter.class)
         .build();
   }
 
