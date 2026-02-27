@@ -8,6 +8,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -24,7 +25,13 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Table(name = "refresh_tokens")
+@Table(
+    name = "refresh_tokens",
+    indexes = {
+      @Index(name = "IDX_REFRESH_TOKENS_USER_ID", columnList = "user_id"),
+      @Index(name = "IDX_REFRESH_TOKENS_EXPIRED_AT", columnList = "expired_at"),
+      @Index(name = "IDX_REFRESH_TOKENS_USER_ID_EXPIRED_AT", columnList = "user_id, expired_at")
+    })
 @Builder
 @EntityListeners(AuditingEntityListener.class)
 public class RefreshToken {

@@ -1,4 +1,4 @@
-package com.example.app.auth.presentation.cookie;
+package com.example.app.auth.infrastructure.cookie;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 

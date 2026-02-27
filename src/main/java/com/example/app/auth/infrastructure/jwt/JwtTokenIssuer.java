@@ -6,6 +6,7 @@ import com.example.app.core.jwt.IssueAccessTokenResult;
 import com.example.app.core.jwt.JwtClaim;
 import com.example.app.core.jwt.JwtProvider;
 import com.example.app.user.domain.User;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -21,5 +22,13 @@ public class JwtTokenIssuer {
 
   public String issueRefreshToken(Long userId) {
     return refreshTokenRepository.save(RefreshToken.issue(userId)).getId();
+  }
+
+  public Optional<RefreshToken> getRefreshToken(String refreshTokenId) {
+    return refreshTokenRepository.findValidByIdWithUser(refreshTokenId);
+  }
+
+  public void revokeRefreshToken(String refreshTokenId) {
+    refreshTokenRepository.deleteById(refreshTokenId);
   }
 }

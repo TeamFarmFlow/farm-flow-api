@@ -1,4 +1,4 @@
-package com.example.app.auth.presentation.cookie;
+package com.example.app.auth.infrastructure.cookie;
 
 import jakarta.servlet.http.HttpServletResponse;
 import java.time.Duration;
