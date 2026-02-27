@@ -1,4 +1,4 @@
-package com.example.FarmFlow;
+package com.example.app;
 
 import lombok.Builder;
 import lombok.Getter;

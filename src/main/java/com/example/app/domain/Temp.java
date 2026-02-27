@@ -1,4 +1,4 @@
-package com.example.FarmFlow.domain;
+package com.example.app.domain;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

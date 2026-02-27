@@ -1,4 +1,4 @@
-package com.example.FarmFlow.configuration;
+package com.example.app.configuration;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.bind.annotation.RestController;

@@ -1,4 +1,4 @@
-package com.example.FarmFlow;
+package com.example.app;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;

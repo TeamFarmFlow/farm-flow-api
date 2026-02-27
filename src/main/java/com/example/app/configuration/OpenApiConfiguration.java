@@ -1,4 +1,4 @@
-package com.example.FarmFlow.configuration;
+package com.example.app.configuration;
 
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;

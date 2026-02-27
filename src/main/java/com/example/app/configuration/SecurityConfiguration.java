@@ -1,4 +1,4 @@
-package com.example.FarmFlow.configuration;
+package com.example.app.configuration;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
