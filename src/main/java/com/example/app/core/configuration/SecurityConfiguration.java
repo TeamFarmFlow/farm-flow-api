@@ -22,7 +22,7 @@ import com.example.app.core.security.SecurityAuthenticationEntryPoint;
 import lombok.RequiredArgsConstructor;
 
 @Configuration
-@EnableConfigurationProperties({CorsProperties.class})
+@EnableConfigurationProperties(CorsProperties.class)
 @RequiredArgsConstructor
 public class SecurityConfiguration {
   private final SecurityAuthenticationEntryPoint authenticationEntryPoint;

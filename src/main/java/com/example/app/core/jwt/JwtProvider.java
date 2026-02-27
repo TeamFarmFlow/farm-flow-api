@@ -28,23 +28,25 @@ public class JwtProvider {
     this.accessTokenExpireMs = accessTokenExpireMs;
   }
 
-  public String createAccessToken(User user) {
+  public IssueAccessTokenResult createAccessToken(User user) {
     return createAccessToken(JwtClaim.userOf(user));
   }
 
-  public String createAccessToken(JwtClaim claim) {
+  public IssueAccessTokenResult createAccessToken(JwtClaim claim) {
     Date now = new Date();
-    Date exp = new Date(now.getTime() + accessTokenExpireMs);
+    Date expiration = new Date(now.getTime() + accessTokenExpireMs);
 
-    return Jwts.builder()
+    String token = Jwts.builder()
         .subject(claim.getEmail())
         .claim("id", claim.getId())
         .claim("email", claim.getEmail())
         .claim("type", claim.getType().name())
         .issuedAt(now)
-        .expiration(exp)
+        .expiration(expiration)
         .signWith(secretKey)
         .compact();
+
+    return IssueAccessTokenResult.from(token, expiration);
   }
 
   public Claims parseClaims(String token) {

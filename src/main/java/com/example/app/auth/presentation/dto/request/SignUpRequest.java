@@ -1,5 +1,7 @@
 package com.example.app.auth.presentation.dto.request;
 
+import com.example.app.auth.application.signup.SignUpCommand;
+
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
@@ -20,4 +22,8 @@ public class SignUpRequest {
 
     @NotBlank(message = "비밀번호는 필수 입력값입니다.")
     private String confirmPassword;
+
+    public SignUpCommand toCommand() {
+        return new SignUpCommand(email, name, password);
+    }
 }

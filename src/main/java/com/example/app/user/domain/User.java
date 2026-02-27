@@ -33,8 +33,8 @@ public class User extends BaseTimeEntity {
   @Column(nullable = false)
   private UserType type;
 
-  @Column(nullable = false)
-  private boolean isActive = true;
+  @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT TRUE")
+  private boolean isActive;
 
   @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
   private final List<FarmUser> farmUsers = new ArrayList<>();

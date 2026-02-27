@@ -1,16 +1,20 @@
 package com.example.app.auth.presentation.dto.response;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import java.time.Instant;
 
-import java.time.LocalDateTime;
+import com.example.app.auth.application.signup.SignUpResult;
 
-@Getter
-@Setter
-@Builder
-public class SignUpResponse {
-    private final String accessToken;
-    private final int expiresIn;
-    private final LocalDateTime expiredAt;
+public record SignUpResponse(
+        String accessToken,
+        Instant expiresAt,
+        long expiresIn,
+        SignUpUserResponse user) {
+
+    public static SignUpResponse from(SignUpResult result) {
+        return new SignUpResponse(
+                result.accessToken(),
+                result.expiresAt(),
+                result.expiresIn(),
+                SignUpUserResponse.from(result.user()));
+    }
 }
