@@ -25,7 +25,7 @@ public class OpenApiConfiguration {
                 Info info = new Info()
                                 .title("FarmFlow API")
                                 .description("Farm Flow API Document")
-                                .version("1.0");
+                                .version("1.0.0");
 
                 return new OpenAPI()
                                 .info(info)

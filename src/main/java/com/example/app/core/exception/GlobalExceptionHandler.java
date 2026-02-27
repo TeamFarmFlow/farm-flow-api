@@ -27,9 +27,10 @@ public class GlobalExceptionHandler {
     return ErrorResponse.of("NOT_FOUND", HttpStatus.NOT_FOUND, "Resource not found");
   }
 
-  @ExceptionHandler(Exception.class)
-  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-  public ErrorResponse handleUnexpected(Exception e) {
-    return ErrorResponse.of("INTERNAL_SERVER_ERROR", HttpStatus.INTERNAL_SERVER_ERROR, "Unexpected error");
-  }
+  // @ExceptionHandler(Exception.class)
+  // @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+  // public ErrorResponse handleUnexpected(Exception e) {
+  // return ErrorResponse.of("INTERNAL_SERVER_ERROR",
+  // HttpStatus.INTERNAL_SERVER_ERROR, "Unexpected error");
+  // }
 }
