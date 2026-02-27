@@ -11,7 +11,7 @@ cors:
 cookie:
   refresh-token:
     name: x-farm-flow-refresh-token
-    path: /auth
+    path: /
     same-site: Lax
     secure: false
     http-only: true

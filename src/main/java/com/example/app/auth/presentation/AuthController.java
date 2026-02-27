@@ -25,7 +25,7 @@ public class AuthController {
     private final SignUpUseCase signUpUseCase;
 
     @Operation(summary = "회원가입")
-    @PostMapping("/sign-up")
+    @PostMapping("/signup")
     public SignUpResponse signUp(
             @Valid @RequestBody SignUpRequest request,
             HttpServletResponse response) {
