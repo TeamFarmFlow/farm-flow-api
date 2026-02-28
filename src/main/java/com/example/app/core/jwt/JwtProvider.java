@@ -2,7 +2,6 @@ package com.example.app.core.jwt;
 
 import com.example.app.user.domain.User;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import java.nio.charset.StandardCharsets;
@@ -32,16 +31,15 @@ public class JwtProvider {
     Date now = new Date();
     Date expiration = new Date(now.getTime() + accessTokenExpireMs);
 
-    String token =
-        Jwts.builder()
-            .subject(claim.getEmail())
-            .claim("id", claim.getId())
-            .claim("email", claim.getEmail())
-            .claim("type", claim.getType().name())
-            .issuedAt(now)
-            .expiration(expiration)
-            .signWith(secretKey)
-            .compact();
+    String token = Jwts.builder()
+        .subject(claim.getEmail())
+        .claim("id", claim.getId())
+        .claim("email", claim.getEmail())
+        .claim("type", claim.getType().name())
+        .issuedAt(now)
+        .expiration(expiration)
+        .signWith(secretKey)
+        .compact();
 
     return IssueAccessTokenResult.from(token, expiration);
   }
@@ -50,16 +48,7 @@ public class JwtProvider {
     return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload();
   }
 
-  public boolean validate(String token) {
-    try {
-      parseClaims(token);
-      return true;
-    } catch (JwtException | IllegalArgumentException e) {
-      return false;
-    }
-  }
-
-  public JwtClaim getJwtClaim(String token) {
+  public JwtClaim validate(String token) {
     return JwtClaim.claimsOf(parseClaims(token));
   }
 

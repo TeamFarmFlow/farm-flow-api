@@ -31,19 +31,18 @@ public class SecurityConfiguration {
   @Bean
   SecurityFilterChain filterChain(HttpSecurity http) {
     return http.csrf(csrf -> csrf.disable())
-        .cors(cors -> {})
+        .cors(cors -> {
+        })
         .sessionManagement(
-            sessionMenagement ->
-                sessionMenagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            sessionMenagement -> sessionMenagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .exceptionHandling(eh -> eh.authenticationEntryPoint(authenticationEntryPoint))
         .authorizeHttpRequests(
-            auth ->
-                auth.requestMatchers("/api/v1", "/api/v1/", "/api/v1/auth/**")
-                    .permitAll()
-                    .requestMatchers("/api/v1/**")
-                    .authenticated()
-                    .anyRequest()
-                    .permitAll())
+            auth -> auth.requestMatchers("/api/v1", "/api/v1/", "/api/v1/auth/**")
+                .permitAll()
+                .requestMatchers("/api/v1/**")
+                .authenticated()
+                .anyRequest()
+                .permitAll())
         .addFilterBefore(
             new JwtFilter(jwtProvider, authenticationEntryPoint),
             UsernamePasswordAuthenticationFilter.class)

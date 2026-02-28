@@ -24,12 +24,19 @@ public class SecurityAuthenticationEntryPoint implements AuthenticationEntryPoin
       AuthenticationException authException)
       throws IOException {
 
+    String errorCode = "UNAUTHORIZED";
+    String message = authException.getMessage();
+
+    if ("Expired token".equals(message)) {
+      errorCode = "EXPIRED_TOKEN";
+    } else if ("Invalid token".equals(message)) {
+      errorCode = "INVALID_TOKEN";
+    }
+
     response.setStatus(HttpStatus.UNAUTHORIZED.value());
     response.setContentType("application/json;charset=UTF-8");
 
-    String errorMessage = "Unauthorized " + request.getRequestURI();
-    ErrorResponse errorResponse =
-        ErrorResponse.of("UNAUTHORIZED", HttpStatus.UNAUTHORIZED, errorMessage);
+    ErrorResponse errorResponse = ErrorResponse.of(errorCode, HttpStatus.UNAUTHORIZED, message);
 
     objectMapper.writeValue(response.getWriter(), errorResponse);
   }
