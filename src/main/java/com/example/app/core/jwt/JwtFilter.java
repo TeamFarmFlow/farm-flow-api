@@ -11,14 +11,15 @@ import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.AntPathMatcher;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 @RequiredArgsConstructor
 public class JwtFilter extends OncePerRequestFilter {
+  public final String[] PERMIT_ALL_PATHS = {"/api/v1", "/api/v1/", "/api/v1/auth/**"};
 
   private final JwtProvider jwtProvider;
   private final SecurityAuthenticationEntryPoint authenticationEntryPoint;
@@ -26,9 +27,14 @@ public class JwtFilter extends OncePerRequestFilter {
 
   private boolean isPermitAllPath(HttpServletRequest request) {
     String path = request.getServletPath();
-    return matcher.match("/api/v1", path)
-        || matcher.match("/api/v1/", path)
-        || matcher.match("/api/v1/auth/**", path);
+
+    for (String permitAllPath : PERMIT_ALL_PATHS) {
+      if (matcher.match(permitAllPath, path)) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   @Override
@@ -48,8 +54,8 @@ public class JwtFilter extends OncePerRequestFilter {
       JwtClaim claim = jwtProvider.validate(token);
 
       CustomUserDetails principal = new CustomUserDetails(claim);
-      Authentication authentication = new UsernamePasswordAuthenticationToken(
-          principal, null, principal.getAuthorities());
+      Authentication authentication =
+          new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities());
 
       SecurityContextHolder.getContext().setAuthentication(authentication);
       filterChain.doFilter(request, response);

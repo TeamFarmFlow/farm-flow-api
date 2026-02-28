@@ -31,15 +31,16 @@ public class JwtProvider {
     Date now = new Date();
     Date expiration = new Date(now.getTime() + accessTokenExpireMs);
 
-    String token = Jwts.builder()
-        .subject(claim.getEmail())
-        .claim("id", claim.getId())
-        .claim("email", claim.getEmail())
-        .claim("type", claim.getType().name())
-        .issuedAt(now)
-        .expiration(expiration)
-        .signWith(secretKey)
-        .compact();
+    String token =
+        Jwts.builder()
+            .subject(claim.getEmail())
+            .claim("id", claim.getId())
+            .claim("email", claim.getEmail())
+            .claim("type", claim.getType().name())
+            .issuedAt(now)
+            .expiration(expiration)
+            .signWith(secretKey)
+            .compact();
 
     return IssueAccessTokenResult.from(token, expiration);
   }

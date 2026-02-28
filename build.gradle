@@ -65,7 +65,6 @@ tasks.named('asciidoctor') {
 tasks.register("installGitHooks", Copy) {
 	from(file(".githooks"))
 	into(file(".git/hooks"))
-	fileMode = 0775
 }
 
 tasks.named("build") {

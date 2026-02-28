@@ -31,6 +31,8 @@ public class SecurityAuthenticationEntryPoint implements AuthenticationEntryPoin
       errorCode = "EXPIRED_TOKEN";
     } else if ("Invalid token".equals(message)) {
       errorCode = "INVALID_TOKEN";
+    } else {
+      message = "Unauthorized";
     }
 
     response.setStatus(HttpStatus.UNAUTHORIZED.value());
