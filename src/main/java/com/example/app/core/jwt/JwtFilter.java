@@ -28,7 +28,7 @@ public class JwtFilter extends OncePerRequestFilter {
   private boolean isPermitAllPath(HttpServletRequest request) {
     String path = request.getServletPath();
 
-    for (String permitAllPath : PERMIT_ALL_PATHS) {
+    for (var permitAllPath : PERMIT_ALL_PATHS) {
       if (matcher.match(permitAllPath, path)) {
         return true;
       }
