@@ -10,6 +10,7 @@ import lombok.*;
 
 @Entity
 @Getter
+@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Table(name = "farms")
@@ -31,4 +32,14 @@ public class Farm extends BaseTimeEntity {
 
   @OneToMany(mappedBy = "farm", cascade = CascadeType.ALL, orphanRemoval = true)
   private final List<FarmUser> farmUsers = new ArrayList<>();
+
+  public void update(String name, FarmStatus status) {
+    this.name = name;
+    this.status = status;
+  }
+
+  public void delete() {
+    this.deletedAt = Instant.now();
+    this.status = FarmStatus.DELETED;
+  }
 }

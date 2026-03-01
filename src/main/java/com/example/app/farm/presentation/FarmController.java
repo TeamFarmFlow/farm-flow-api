@@ -4,7 +4,9 @@ import com.example.app.core.guard.UserTypeGuard;
 import com.example.app.core.jwt.CustomUserDetails;
 import com.example.app.farm.application.FarmService;
 import com.example.app.farm.presentation.dto.request.FarmRegisterRequest;
+import com.example.app.farm.presentation.dto.request.FarmUpdateRequest;
 import com.example.app.farm.presentation.dto.response.FarmRegisterResponse;
+import com.example.app.farm.presentation.dto.response.FarmUpdateResponse;
 import com.example.app.user.domain.enums.UserType;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -12,10 +14,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "농장")
 @RestController
@@ -35,8 +34,29 @@ public class FarmController {
   }
 
   // 농장 조회
+  //  @Operation(summary = "농장 목록 조회")
+  //  @UserTypeGuard(UserType.OWNER)
+  //  @GetMapping()
+  //  public ResponseEntity<List<Farm>> getFarmList(@Valid Authentication authentication)
 
-  // 농장 수정
+  @Operation(summary = "농장 수정")
+  @UserTypeGuard(UserType.OWNER)
+  @PutMapping("{id}")
+  public ResponseEntity<FarmUpdateResponse> updateFarm(
+      @Valid @RequestBody FarmUpdateRequest request,
+      @PathVariable Long id,
+      Authentication authentication) {
+    Long userId = ((CustomUserDetails) authentication.getPrincipal()).getId();
+    var result = farmService.update(request.toCommand(), id);
+    return ResponseEntity.ok(
+        new FarmUpdateResponse(result.getId(), userId, result.getName(), result.getStatus()));
+  }
 
-  // 농장 삭제
+  @Operation(summary = "농장 삭제")
+  @UserTypeGuard(UserType.OWNER)
+  @DeleteMapping("{id}")
+  public ResponseEntity<Void> deleteFarm(@PathVariable Long id) {
+    farmService.deleteFarm(id);
+    return ResponseEntity.noContent().build();
+  }
 }
