@@ -4,14 +4,18 @@ import com.example.app.farm.application.command.FarmRegisterCommand;
 import com.example.app.farm.application.command.FarmUpdateCommand;
 import com.example.app.farm.domain.Farm;
 import com.example.app.farm.domain.FarmRepository;
-import com.example.app.farm.domain.FarmUser;
 import com.example.app.farm.domain.FarmUserRepository;
 import com.example.app.farm.domain.enums.FarmStatus;
 import com.example.app.farm.domain.exception.FarmNotFoundException;
+import com.example.app.farm.presentation.dto.response.*;
 import com.example.app.user.application.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -22,22 +26,50 @@ public class FarmService {
   private final UserService userService;
 
   @Transactional
-  public Farm register(FarmRegisterCommand command, Long userId) {
+  public FarmRegisterResponse register(FarmRegisterCommand command, Long userId) {
     Farm farm = Farm.builder().name(command.name()).status(FarmStatus.ACTIVE).build();
     farmRepository.save(farm);
 
-    FarmUser farmUser = new FarmUser(farm, userService.getUserById(userId));
-    farmUserRepository.save(farmUser);
+    farm.addFarmUser(userService.getUserById(userId));
+    return new FarmRegisterResponse(farm.getId());
+  }
 
-    return farm;
+  public Page<FarmListResponse> getFarms(Long userId, Pageable pageable) {
+    return farmRepository.findByUserId(userId, pageable)
+            .map(farm -> new FarmListResponse(
+                    farm.getId(),
+                    farm.getName(),
+                    farm.getStatus(),
+                    farm.getCreatedAt()
+            ));
+  }
+
+  public FarmDetailResponse getFarm(Long id) {
+    Farm farm = farmRepository.findById(id).orElseThrow(() -> new FarmNotFoundException(id));
+
+    List<FarmMemberResponse> members = farmUserRepository.findUsersByFarmId(id).stream()
+            .map(u -> new FarmMemberResponse(
+                    u.getId(),
+                    u.getName(),
+                    u.getEmail(),
+                    u.getStatus()
+            )).toList();
+
+    return new FarmDetailResponse(
+            farm.getId(),
+            farm.getName(),
+            farm.getStatus(),
+            farm.getCreatedAt(),
+            farm.getUpdatedAt(),
+            members);
   }
 
   @Transactional
-  public Farm update(FarmUpdateCommand command, Long farmId) {
+  public FarmUpdateResponse update(FarmUpdateCommand command, Long farmId) {
     Farm farm =
         farmRepository.findById(farmId).orElseThrow(() -> new FarmNotFoundException(farmId));
     farm.update(command.name(), command.status());
-    return farm;
+    return new FarmUpdateResponse(farm.getId(),farm.getName(), farm.getStatus()) ;
   }
 
   @Transactional

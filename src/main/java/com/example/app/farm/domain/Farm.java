@@ -2,6 +2,7 @@ package com.example.app.farm.domain;
 
 import com.example.app.core.entity.BaseTimeEntity;
 import com.example.app.farm.domain.enums.FarmStatus;
+import com.example.app.user.domain.User;
 import jakarta.persistence.*;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -32,6 +33,11 @@ public class Farm extends BaseTimeEntity {
 
   @OneToMany(mappedBy = "farm", cascade = CascadeType.ALL, orphanRemoval = true)
   private final List<FarmUser> farmUsers = new ArrayList<>();
+
+  public void addFarmUser(User user) {
+    FarmUser farmUser = new FarmUser(this, user);
+    this.farmUsers.add(farmUser);
+  }
 
   public void update(String name, FarmStatus status) {
     this.name = name;
