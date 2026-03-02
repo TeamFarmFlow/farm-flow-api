@@ -56,4 +56,8 @@ public class User extends BaseTimeEntity {
 
   @Column(nullable = true)
   private Instant deletedAt;
+
+  public static User farmOf(Long userId) {
+    return User.builder().id(userId).build();
+  }
 }

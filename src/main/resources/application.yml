@@ -33,7 +33,7 @@ spring:
 
 jwt:
   secret: dHJvdWJsZXNvbWUtYWRtaW4tYXBpLXNlcnZlci1qc29ud2VidG9rZW4tYWNjZXNzLXRva2VuLXNlY3JldA==
-  expiration-seconds: 86400
+  expiration-seconds: 600000
 
 logging:
   level:

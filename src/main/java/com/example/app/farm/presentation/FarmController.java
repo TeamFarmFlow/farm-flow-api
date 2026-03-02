@@ -6,9 +6,9 @@ import com.example.app.farm.application.FarmService;
 import com.example.app.farm.presentation.dto.request.FarmRegisterRequest;
 import com.example.app.farm.presentation.dto.request.FarmUpdateRequest;
 import com.example.app.farm.presentation.dto.response.FarmDetailResponse;
+import com.example.app.farm.presentation.dto.response.FarmListResponse;
 import com.example.app.farm.presentation.dto.response.FarmRegisterResponse;
 import com.example.app.farm.presentation.dto.response.FarmUpdateResponse;
-import com.example.app.farm.presentation.dto.response.FarmListResponse;
 import com.example.app.user.domain.enums.UserType;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -43,8 +43,11 @@ public class FarmController {
   @Operation(summary = "농장 목록 조회")
   @UserTypeGuard(UserType.OWNER)
   @GetMapping()
-  public ResponseEntity<Page<FarmListResponse>> getFarms(Authentication authentication,
-                                                         @ParameterObject @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable){
+  public ResponseEntity<Page<FarmListResponse>> getFarms(
+      Authentication authentication,
+      @ParameterObject
+          @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC)
+          Pageable pageable) {
     Long userId = ((CustomUserDetails) authentication.getPrincipal()).getId();
     return ResponseEntity.ok(farmService.getFarms(userId, pageable));
   }
@@ -61,8 +64,7 @@ public class FarmController {
   @UserTypeGuard(UserType.OWNER)
   @PutMapping("{id}")
   public ResponseEntity<FarmUpdateResponse> updateFarm(
-      @Valid @RequestBody FarmUpdateRequest request,
-      @PathVariable Long id) {
+      @Valid @RequestBody FarmUpdateRequest request, @PathVariable Long id) {
     return ResponseEntity.ok(farmService.update(request.toCommand(), id));
   }
 
