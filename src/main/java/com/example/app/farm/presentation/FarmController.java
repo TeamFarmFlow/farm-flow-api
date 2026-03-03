@@ -57,8 +57,8 @@ public class FarmController {
   @Operation(summary = "농장 정보 조회")
   @UserTypeGuard(UserType.OWNER)
   @GetMapping("{id}")
-  public ResponseEntity<FarmDetailResponse> getFarm(@PathVariable Long id,
-                                                    Authentication authentication) {
+  public ResponseEntity<FarmDetailResponse> getFarm(
+      @PathVariable Long id, Authentication authentication) {
     Long userId = ((CustomUserDetails) authentication.getPrincipal()).getId();
     var result = farmService.getFarm(id, userId);
     return ResponseEntity.ok(result);
@@ -68,7 +68,8 @@ public class FarmController {
   @UserTypeGuard(UserType.OWNER)
   @PutMapping("{id}")
   public ResponseEntity<FarmUpdateResponse> updateFarm(
-      @Valid @RequestBody FarmUpdateRequest request, @PathVariable Long id,
+      @Valid @RequestBody FarmUpdateRequest request,
+      @PathVariable Long id,
       Authentication authentication) {
     Long userId = ((CustomUserDetails) authentication.getPrincipal()).getId();
     return ResponseEntity.ok(farmService.update(request.toCommand(), id, userId));
@@ -77,8 +78,7 @@ public class FarmController {
   @Operation(summary = "농장 삭제")
   @UserTypeGuard(UserType.OWNER)
   @DeleteMapping("{id}")
-  public ResponseEntity<Void> deleteFarm(@PathVariable Long id,
-                                         Authentication authentication) {
+  public ResponseEntity<Void> deleteFarm(@PathVariable Long id, Authentication authentication) {
     Long userId = ((CustomUserDetails) authentication.getPrincipal()).getId();
     farmService.deleteFarm(id, userId);
     return ResponseEntity.noContent().build();

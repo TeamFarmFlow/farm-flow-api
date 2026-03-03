@@ -44,7 +44,8 @@ public class FarmService {
   }
 
   public FarmDetailResponse getFarm(Long id, Long userId) {
-    Farm farm = farmRepository.findByUserId(id, userId).orElseThrow(() -> new FarmNotFoundException(id));
+    Farm farm =
+        farmRepository.findByUserId(id, userId).orElseThrow(() -> new FarmNotFoundException(id));
 
     List<FarmMemberResponse> members =
         farmUserRepository.findUsersByFarmId(id).stream()
@@ -62,14 +63,16 @@ public class FarmService {
 
   @Transactional
   public FarmUpdateResponse update(FarmUpdateCommand command, Long id, Long userId) {
-    Farm farm = farmRepository.findByUserId(id, userId).orElseThrow(() -> new FarmNotFoundException(id));
+    Farm farm =
+        farmRepository.findByUserId(id, userId).orElseThrow(() -> new FarmNotFoundException(id));
     farm.update(command.name(), command.status());
     return new FarmUpdateResponse(farm.getId(), farm.getName(), farm.getStatus());
   }
 
   @Transactional
   public void deleteFarm(Long id, Long userId) {
-    Farm farm = farmRepository.findByUserId(id, userId).orElseThrow(() -> new FarmNotFoundException(id));
+    Farm farm =
+        farmRepository.findByUserId(id, userId).orElseThrow(() -> new FarmNotFoundException(id));
     farm.delete();
   }
 }
