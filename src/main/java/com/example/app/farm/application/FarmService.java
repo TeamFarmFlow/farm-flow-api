@@ -36,15 +36,15 @@ public class FarmService {
 
   public Page<FarmListResponse> getFarms(Long userId, Pageable pageable) {
     return farmRepository
-        .findByUserId(userId, pageable)
+        .findAllByUserId(userId, pageable)
         .map(
             farm ->
                 new FarmListResponse(
                     farm.getId(), farm.getName(), farm.getStatus(), farm.getCreatedAt()));
   }
 
-  public FarmDetailResponse getFarm(Long id) {
-    Farm farm = farmRepository.findById(id).orElseThrow(() -> new FarmNotFoundException(id));
+  public FarmDetailResponse getFarm(Long id, Long userId) {
+    Farm farm = farmRepository.findByUserId(id, userId).orElseThrow(() -> new FarmNotFoundException(id));
 
     List<FarmMemberResponse> members =
         farmUserRepository.findUsersByFarmId(id).stream()
@@ -61,17 +61,15 @@ public class FarmService {
   }
 
   @Transactional
-  public FarmUpdateResponse update(FarmUpdateCommand command, Long farmId) {
-    Farm farm =
-        farmRepository.findById(farmId).orElseThrow(() -> new FarmNotFoundException(farmId));
+  public FarmUpdateResponse update(FarmUpdateCommand command, Long id, Long userId) {
+    Farm farm = farmRepository.findByUserId(id, userId).orElseThrow(() -> new FarmNotFoundException(id));
     farm.update(command.name(), command.status());
     return new FarmUpdateResponse(farm.getId(), farm.getName(), farm.getStatus());
   }
 
   @Transactional
-  public void deleteFarm(Long farmId) {
-    Farm farm =
-        farmRepository.findById(farmId).orElseThrow(() -> new FarmNotFoundException(farmId));
+  public void deleteFarm(Long id, Long userId) {
+    Farm farm = farmRepository.findByUserId(id, userId).orElseThrow(() -> new FarmNotFoundException(id));
     farm.delete();
   }
 }

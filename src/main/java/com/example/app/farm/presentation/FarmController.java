@@ -1,5 +1,6 @@
 package com.example.app.farm.presentation;
 
+import com.example.app.core.dto.response.PageResponse;
 import com.example.app.core.guard.UserTypeGuard;
 import com.example.app.core.jwt.CustomUserDetails;
 import com.example.app.farm.application.FarmService;
@@ -43,20 +44,23 @@ public class FarmController {
   @Operation(summary = "농장 목록 조회")
   @UserTypeGuard(UserType.OWNER)
   @GetMapping()
-  public ResponseEntity<Page<FarmListResponse>> getFarms(
+  public ResponseEntity<PageResponse<FarmListResponse>> getFarms(
       Authentication authentication,
       @ParameterObject
           @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC)
           Pageable pageable) {
     Long userId = ((CustomUserDetails) authentication.getPrincipal()).getId();
-    return ResponseEntity.ok(farmService.getFarms(userId, pageable));
+    Page<FarmListResponse> page = farmService.getFarms(userId, pageable);
+    return ResponseEntity.ok(PageResponse.from(page));
   }
 
   @Operation(summary = "농장 정보 조회")
   @UserTypeGuard(UserType.OWNER)
   @GetMapping("{id}")
-  public ResponseEntity<FarmDetailResponse> getFarm(@PathVariable Long id) {
-    var result = farmService.getFarm(id);
+  public ResponseEntity<FarmDetailResponse> getFarm(@PathVariable Long id,
+                                                    Authentication authentication) {
+    Long userId = ((CustomUserDetails) authentication.getPrincipal()).getId();
+    var result = farmService.getFarm(id, userId);
     return ResponseEntity.ok(result);
   }
 
@@ -64,15 +68,19 @@ public class FarmController {
   @UserTypeGuard(UserType.OWNER)
   @PutMapping("{id}")
   public ResponseEntity<FarmUpdateResponse> updateFarm(
-      @Valid @RequestBody FarmUpdateRequest request, @PathVariable Long id) {
-    return ResponseEntity.ok(farmService.update(request.toCommand(), id));
+      @Valid @RequestBody FarmUpdateRequest request, @PathVariable Long id,
+      Authentication authentication) {
+    Long userId = ((CustomUserDetails) authentication.getPrincipal()).getId();
+    return ResponseEntity.ok(farmService.update(request.toCommand(), id, userId));
   }
 
   @Operation(summary = "농장 삭제")
   @UserTypeGuard(UserType.OWNER)
   @DeleteMapping("{id}")
-  public ResponseEntity<Void> deleteFarm(@PathVariable Long id) {
-    farmService.deleteFarm(id);
+  public ResponseEntity<Void> deleteFarm(@PathVariable Long id,
+                                         Authentication authentication) {
+    Long userId = ((CustomUserDetails) authentication.getPrincipal()).getId();
+    farmService.deleteFarm(id, userId);
     return ResponseEntity.noContent().build();
   }
 }
