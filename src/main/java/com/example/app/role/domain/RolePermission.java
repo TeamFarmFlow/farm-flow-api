@@ -10,11 +10,10 @@ import lombok.*;
 @Table(name = "role_permissions")
 @Builder
 public class RolePermission {
-    @EmbeddedId
-    private RolePermissionId id;
+  @EmbeddedId private RolePermissionId id;
 
-    @MapsId("roleId")
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "role_id", nullable = false)
-    private Role role;
+  @MapsId("roleId")
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "role_id", nullable = false)
+  private Role role;
 }

@@ -1,7 +1,7 @@
 package com.example.app.user.domain;
 
-import com.example.app.shared.entity.BaseTimeEntity;
 import com.example.app.farm.domain.FarmUser;
+import com.example.app.shared.entity.BaseTimeEntity;
 import com.example.app.user.domain.enums.UserStatus;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;

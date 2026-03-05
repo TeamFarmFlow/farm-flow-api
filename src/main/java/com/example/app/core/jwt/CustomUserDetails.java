@@ -1,6 +1,5 @@
 package com.example.app.core.jwt;
 
-import com.example.app.user.domain.enums.UserType;
 import java.util.Collection;
 import java.util.List;
 import lombok.Getter;
@@ -22,7 +21,6 @@ public class CustomUserDetails implements UserDetails {
   public Long getId() {
     return id;
   }
-
 
   @Override
   public String getUsername() {

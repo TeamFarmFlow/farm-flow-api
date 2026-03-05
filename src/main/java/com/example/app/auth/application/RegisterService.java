@@ -6,7 +6,6 @@ import com.example.app.auth.application.result.AuthUser;
 import com.example.app.auth.domain.exception.DuplicateEmailException;
 import com.example.app.auth.infrastructure.jwt.JwtTokenIssuer;
 import com.example.app.user.application.UserService;
-import com.example.app.user.domain.enums.UserType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,8 +22,7 @@ public class RegisterService {
       throw new DuplicateEmailException(command.email());
     }
 
-    var user =
-        userService.saveUser(command.email(), command.name(), command.password());
+    var user = userService.saveUser(command.email(), command.name(), command.password());
     var issueAccessTokenResult = jwtTokenIssuer.issueAccessToken(user);
     var refreshToken = jwtTokenIssuer.issueRefreshToken(user.getId());
 

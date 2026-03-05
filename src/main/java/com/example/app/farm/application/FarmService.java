@@ -11,13 +11,12 @@ import com.example.app.farm.presentation.dto.response.FarmListResponse;
 import com.example.app.farm.presentation.dto.response.FarmMemberResponse;
 import com.example.app.farm.presentation.dto.response.FarmRegisterResponse;
 import com.example.app.farm.presentation.dto.response.FarmUpdateResponse;
-import java.util.List;
-import java.util.Map;
-
 import com.example.app.role.application.RoleSeedService;
 import com.example.app.role.domain.Role;
 import com.example.app.user.domain.User;
 import com.example.app.user.domain.UserRepository;
+import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -35,14 +34,16 @@ public class FarmService {
 
   @Transactional
   public FarmRegisterResponse register(FarmRegisterCommand command, Long userId) {
-    User user = userRepository.findById(userId).orElseThrow(() -> new FarmNotFoundException(userId));
+    User user =
+        userRepository.findById(userId).orElseThrow(() -> new FarmNotFoundException(userId));
 
     Farm farm = Farm.builder().name(command.name()).status(FarmStatus.ACTIVE).build();
     farmRepository.save(farm);
 
     Map<String, Role> roleMap = roleSeedService.seed(farm);
 
-    FarmUser farmUser = FarmUser.builder()
+    FarmUser farmUser =
+        FarmUser.builder()
             .id(new FarmUserId(farm.getId(), user.getId()))
             .farm(farm)
             .user(user)

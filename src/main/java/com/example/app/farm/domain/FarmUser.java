@@ -1,8 +1,8 @@
 package com.example.app.farm.domain;
 
-import com.example.app.shared.entity.BaseTimeEntity;
 import com.example.app.farm.domain.enums.FarmUserStatus;
 import com.example.app.role.domain.Role;
+import com.example.app.shared.entity.BaseTimeEntity;
 import com.example.app.user.domain.User;
 import jakarta.persistence.*;
 import lombok.*;
