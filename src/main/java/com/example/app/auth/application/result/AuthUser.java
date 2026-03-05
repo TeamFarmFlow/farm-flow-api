@@ -7,7 +7,6 @@ import java.time.Instant;
 
 public record AuthUser(
     Long id,
-    UserType type,
     String email,
     String name,
     UserStatus status,
@@ -16,7 +15,6 @@ public record AuthUser(
   public static AuthUser from(User user) {
     return new AuthUser(
         user.getId(),
-        user.getType(),
         user.getEmail(),
         user.getName(),
         user.getStatus(),

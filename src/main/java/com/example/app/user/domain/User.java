@@ -1,9 +1,8 @@
 package com.example.app.user.domain;
 
-import com.example.app.core.entity.BaseTimeEntity;
+import com.example.app.shared.entity.BaseTimeEntity;
 import com.example.app.farm.domain.FarmUser;
 import com.example.app.user.domain.enums.UserStatus;
-import com.example.app.user.domain.enums.UserType;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -42,10 +41,6 @@ public class User extends BaseTimeEntity {
 
   @Column(length = 50, nullable = false)
   private String name;
-
-  @Enumerated(EnumType.STRING)
-  @Column(nullable = false, columnDefinition = "VARCHAR(20) NOT NULL")
-  private UserType type;
 
   @Enumerated(EnumType.STRING)
   @Column(nullable = false, columnDefinition = "VARCHAR(20) NOT NULL")

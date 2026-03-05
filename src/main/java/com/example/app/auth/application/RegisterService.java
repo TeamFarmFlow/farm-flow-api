@@ -24,7 +24,7 @@ public class RegisterService {
     }
 
     var user =
-        userService.saveUser(UserType.OWNER, command.email(), command.name(), command.password());
+        userService.saveUser(command.email(), command.name(), command.password());
     var issueAccessTokenResult = jwtTokenIssuer.issueAccessToken(user);
     var refreshToken = jwtTokenIssuer.issueRefreshToken(user.getId());
 

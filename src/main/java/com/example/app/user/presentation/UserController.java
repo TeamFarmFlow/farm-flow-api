@@ -1,9 +1,7 @@
 package com.example.app.user.presentation;
 
-import com.example.app.core.guard.UserTypeGuard;
 import com.example.app.user.application.UserService;
 import com.example.app.user.domain.User;
-import com.example.app.user.domain.enums.UserType;
 import com.example.app.user.presentation.dto.response.UserResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -21,7 +19,6 @@ public class UserController {
   private final UserService userService;
 
   @Operation(summary = "회원 조회")
-  @UserTypeGuard(UserType.OWNER)
   @GetMapping("{id}")
   public UserResponse getMethodName(@PathVariable Long id) {
     User user = userService.getUserById(id);

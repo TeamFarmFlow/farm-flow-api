@@ -1,4 +1,4 @@
-package com.example.app.core.dto.response;
+package com.example.app.shared.dto.response;
 
 import java.util.List;
 import org.springframework.data.domain.Page;

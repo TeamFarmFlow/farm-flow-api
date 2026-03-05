@@ -31,7 +31,7 @@ public class AuthController {
   private final LoginService loginService;
   private final RefreshTokenService refreshTokenService;
 
-  @Operation(summary = "회원가입(농장주)")
+  @Operation(summary = "회원가입")
   @PostMapping("register")
   public ResponseEntity<AuthResponse> register(
       @Valid @RequestBody RegisterRequest request, HttpServletResponse response) {

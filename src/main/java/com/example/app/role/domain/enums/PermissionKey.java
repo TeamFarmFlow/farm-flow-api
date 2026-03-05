@@ -1,0 +1,25 @@
+package com.example.app.role.domain.enums;
+
+import lombok.Getter;
+
+@Getter
+public enum PermissionKey {
+    ATTENDANCE_CHECK_IN,
+    ATTENDANCE_CHECK_OUT,
+    ATTENDANCE_MANAGE,
+
+    ROOM_READING_CREATE,
+    ROOM_READING_UPDATE,
+    ROOM_READING_DELETE,
+    ROOM_READING_READ,
+
+    CYCLE_START,
+    CYCLE_THINNING,
+    CYCLE_HARVEST,
+    CYCLE_END,
+    CYCLE_READ,
+
+    INVITE_MEMBER,
+    MANAGE_MEMBERS,
+    MANAGE_ROLES
+}

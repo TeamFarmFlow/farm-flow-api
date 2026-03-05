@@ -11,13 +11,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 public class CustomUserDetails implements UserDetails {
   private final Long id;
   private final String email;
-  private final UserType type;
   private final Collection<? extends GrantedAuthority> authorities;
 
   public CustomUserDetails(JwtClaim jwtClaim) {
     this.id = jwtClaim.getId();
     this.email = jwtClaim.getEmail();
-    this.type = jwtClaim.getType();
     this.authorities = List.of();
   }
 
@@ -25,9 +23,6 @@ public class CustomUserDetails implements UserDetails {
     return id;
   }
 
-  public UserType getType() {
-    return type;
-  }
 
   @Override
   public String getUsername() {

@@ -3,7 +3,6 @@ package com.example.app.user.application;
 import com.example.app.user.domain.User;
 import com.example.app.user.domain.UserRepository;
 import com.example.app.user.domain.enums.UserStatus;
-import com.example.app.user.domain.enums.UserType;
 import com.example.app.user.domain.exception.UserNotFoundException;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -35,10 +34,9 @@ public class UserService {
   }
 
   @Transactional
-  public User saveUser(UserType type, String email, String name, String password) {
+  public User saveUser(String email, String name, String password) {
     return userRepository.save(
         User.builder()
-            .type(type)
             .email(email)
             .name(name)
             .password(passwordEncoder.encode(password))

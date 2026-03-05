@@ -1,7 +1,6 @@
 package com.example.app.farm.presentation;
 
-import com.example.app.core.dto.response.PageResponse;
-import com.example.app.core.guard.UserTypeGuard;
+import com.example.app.shared.dto.response.PageResponse;
 import com.example.app.core.jwt.CustomUserDetails;
 import com.example.app.farm.application.FarmService;
 import com.example.app.farm.presentation.dto.request.FarmRegisterRequest;
@@ -10,7 +9,6 @@ import com.example.app.farm.presentation.dto.response.FarmDetailResponse;
 import com.example.app.farm.presentation.dto.response.FarmListResponse;
 import com.example.app.farm.presentation.dto.response.FarmRegisterResponse;
 import com.example.app.farm.presentation.dto.response.FarmUpdateResponse;
-import com.example.app.user.domain.enums.UserType;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -33,7 +31,6 @@ public class FarmController {
   private final FarmService farmService;
 
   @Operation(summary = "농장 등록")
-  @UserTypeGuard(UserType.OWNER)
   @PostMapping("register")
   public ResponseEntity<FarmRegisterResponse> register(
       @Valid @RequestBody FarmRegisterRequest request, Authentication authentication) {
@@ -42,7 +39,6 @@ public class FarmController {
   }
 
   @Operation(summary = "농장 목록 조회")
-  @UserTypeGuard(UserType.OWNER)
   @GetMapping()
   public ResponseEntity<PageResponse<FarmListResponse>> getFarms(
       Authentication authentication,
@@ -55,7 +51,6 @@ public class FarmController {
   }
 
   @Operation(summary = "농장 정보 조회")
-  @UserTypeGuard(UserType.OWNER)
   @GetMapping("{id}")
   public ResponseEntity<FarmDetailResponse> getFarm(
       @PathVariable Long id, Authentication authentication) {
@@ -65,7 +60,6 @@ public class FarmController {
   }
 
   @Operation(summary = "농장 수정")
-  @UserTypeGuard(UserType.OWNER)
   @PutMapping("{id}")
   public ResponseEntity<FarmUpdateResponse> updateFarm(
       @Valid @RequestBody FarmUpdateRequest request,
@@ -76,7 +70,6 @@ public class FarmController {
   }
 
   @Operation(summary = "농장 삭제")
-  @UserTypeGuard(UserType.OWNER)
   @DeleteMapping("{id}")
   public ResponseEntity<Void> deleteFarm(@PathVariable Long id, Authentication authentication) {
     Long userId = ((CustomUserDetails) authentication.getPrincipal()).getId();

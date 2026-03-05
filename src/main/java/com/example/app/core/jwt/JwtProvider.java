@@ -36,7 +36,6 @@ public class JwtProvider {
             .subject(claim.getEmail())
             .claim("id", claim.getId())
             .claim("email", claim.getEmail())
-            .claim("type", claim.getType().name())
             .issuedAt(now)
             .expiration(expiration)
             .signWith(secretKey)

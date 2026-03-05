@@ -2,10 +2,9 @@ package com.example.app.farm.application;
 
 import com.example.app.farm.application.command.FarmRegisterCommand;
 import com.example.app.farm.application.command.FarmUpdateCommand;
-import com.example.app.farm.domain.Farm;
-import com.example.app.farm.domain.FarmRepository;
-import com.example.app.farm.domain.FarmUserRepository;
+import com.example.app.farm.domain.*;
 import com.example.app.farm.domain.enums.FarmStatus;
+import com.example.app.farm.domain.enums.FarmUserStatus;
 import com.example.app.farm.domain.exception.FarmNotFoundException;
 import com.example.app.farm.presentation.dto.response.FarmDetailResponse;
 import com.example.app.farm.presentation.dto.response.FarmListResponse;
@@ -13,6 +12,12 @@ import com.example.app.farm.presentation.dto.response.FarmMemberResponse;
 import com.example.app.farm.presentation.dto.response.FarmRegisterResponse;
 import com.example.app.farm.presentation.dto.response.FarmUpdateResponse;
 import java.util.List;
+import java.util.Map;
+
+import com.example.app.role.application.RoleSeedService;
+import com.example.app.role.domain.Role;
+import com.example.app.user.domain.User;
+import com.example.app.user.domain.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,12 +30,28 @@ import org.springframework.transaction.annotation.Transactional;
 public class FarmService {
   private final FarmRepository farmRepository;
   private final FarmUserRepository farmUserRepository;
+  private final UserRepository userRepository;
+  private final RoleSeedService roleSeedService;
 
   @Transactional
   public FarmRegisterResponse register(FarmRegisterCommand command, Long userId) {
+    User user = userRepository.findById(userId).orElseThrow(() -> new FarmNotFoundException(userId));
+
     Farm farm = Farm.builder().name(command.name()).status(FarmStatus.ACTIVE).build();
     farmRepository.save(farm);
-    farm.addFarmUser(userId);
+
+    Map<String, Role> roleMap = roleSeedService.seed(farm);
+
+    FarmUser farmUser = FarmUser.builder()
+            .id(new FarmUserId(farm.getId(), user.getId()))
+            .farm(farm)
+            .user(user)
+            .role(roleMap.get("OWNER"))
+            .status(FarmUserStatus.ACTIVE)
+            .build();
+
+    farmUserRepository.save(farmUser);
+
     return new FarmRegisterResponse(farm.getId());
   }
 
