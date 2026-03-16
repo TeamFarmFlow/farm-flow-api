@@ -30,13 +30,5 @@ public interface FarmUserRepository extends JpaRepository<FarmUser, FarmUserId> 
     """)
   Optional<User> findOwnerUser(Long farmId, Long userId, String roleKey);
 
-  @Query(
-      """
-            select count(u)
-            from FarmUser fu
-            join fu.user u
-            where fu.farm.id = :farmId
-            and u.email = :email
-""")
-  Boolean existsMemberByUserIdAndFarmId(Long farmId, String email);
+  boolean existsByFarm_IdAndUser_Email(Long farmId, String email);
 }

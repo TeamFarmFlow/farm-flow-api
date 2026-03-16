@@ -27,5 +27,5 @@ public interface FarmRepository extends JpaRepository<Farm, Long> {
       and f.id = :id
       and f.deletedAt is null
       """)
-  Optional<Farm> findByUserId(Long id, Long userId);
+  Optional<Farm> findByIdAndUserId(Long id, Long userId);
 }

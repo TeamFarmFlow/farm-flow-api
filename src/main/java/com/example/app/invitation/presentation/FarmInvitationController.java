@@ -17,7 +17,6 @@ public class FarmInvitationController {
 
   private final FarmInvitationService farmInvitationService;
 
-  // 초대 생성
   @Operation(summary = "초대 생성(OWNER)")
   @PostMapping
   public void createInvitation(
