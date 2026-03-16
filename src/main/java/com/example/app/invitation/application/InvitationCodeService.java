@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 public class InvitationCodeService {
 
   private static final String CHAR_POOL =
-          "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789";
+      "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789";
   private static final int CODE_LENGTH = 6;
 
   private final SecureRandom random = new SecureRandom();

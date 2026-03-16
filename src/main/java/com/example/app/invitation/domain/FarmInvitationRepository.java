@@ -5,5 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface FarmInvitationRepository extends JpaRepository<FarmInvitation, Long> {
 
-  Boolean existsByFarmIdAndInviteeEmailAndStatus(Long farmId, String inviteeEmail, FarmInvitationStatus farmInvitationStatus);
+  Boolean existsByFarmIdAndInviteeEmailAndStatus(
+      Long farmId, String inviteeEmail, FarmInvitationStatus farmInvitationStatus);
 }

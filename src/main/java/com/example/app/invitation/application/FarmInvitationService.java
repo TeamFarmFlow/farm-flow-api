@@ -15,12 +15,11 @@ import com.example.app.role.domain.Role;
 import com.example.app.role.domain.RoleRepository;
 import com.example.app.role.domain.enums.SystemRolePreset;
 import com.example.app.user.domain.User;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -36,9 +35,7 @@ public class FarmInvitationService {
   public void createInvitation(FarmInvitationRegisterCommand command, Long farmId, Long userId) {
     // 존재하는 농장인지
     Farm farm =
-        farmRepository
-            .findById(farmId)
-            .orElseThrow(() -> new FarmNotFoundException(farmId));
+        farmRepository.findById(farmId).orElseThrow(() -> new FarmNotFoundException(farmId));
 
     // 농장주가 맞는지
     User inviter =
@@ -49,15 +46,16 @@ public class FarmInvitationService {
     String inviteeEmail = command.email().trim().toLowerCase();
 
     // 해당 이메일 멤버가 이미 멤버인건지 확인
-    boolean alreadyMember =
-            farmUserRepository.existsByFarm_IdAndUser_Email(farmId, inviteeEmail);
+    boolean alreadyMember = farmUserRepository.existsByFarm_IdAndUser_Email(farmId, inviteeEmail);
 
     if (alreadyMember) {
       throw new AlreadyFarmMemberException(inviteeEmail);
     }
 
     // 해당 이메일 멤버가 이미 초대되었는지 확인
-    Boolean isInvited = farmInvitationRepository.existsByFarmIdAndInviteeEmailAndStatus(farmId, inviteeEmail, FarmInvitationStatus.INVITED);
+    Boolean isInvited =
+        farmInvitationRepository.existsByFarmIdAndInviteeEmailAndStatus(
+            farmId, inviteeEmail, FarmInvitationStatus.INVITED);
     if (isInvited) {
       throw new AlreadyFarmInvitedException(inviteeEmail);
     }
@@ -70,7 +68,8 @@ public class FarmInvitationService {
 
     Instant expiresAt = Instant.now().plus(30, ChronoUnit.MINUTES);
 
-    FarmInvitation invitation = FarmInvitation.builder()
+    FarmInvitation invitation =
+        FarmInvitation.builder()
             .farm(farm)
             .inviter(inviter)
             .inviteeEmail(inviteeEmail)
