@@ -62,4 +62,8 @@ public class FarmInvitation extends BaseTimeEntity {
 
   @Column(name = "responded_at")
   private Instant respondedAt;
+
+  public void update(FarmInvitationStatus status) {
+    this.status = status;
+  }
 }
