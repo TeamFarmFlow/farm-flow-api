@@ -9,15 +9,14 @@ import org.springframework.stereotype.Component;
 @Component
 public class InvitationCodeService {
 
-  private static final String CHAR_POOL =
-      "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789";
+  private static final String CHAR_POOL = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
   private static final int CODE_LENGTH = 6;
 
   private final SecureRandom random = new SecureRandom();
 
   public InvitationCode generate() {
     String rawCode = generateRandomCode();
-    String codeHash = sha256(rawCode);
+    String codeHash = hash(rawCode);
     return new InvitationCode(rawCode, codeHash);
   }
 
@@ -35,7 +34,10 @@ public class InvitationCodeService {
   }
 
   private String normalize(String rawCode) {
-    return rawCode == null ? null : rawCode.trim().toUpperCase();
+    if (rawCode == null) {
+      throw new IllegalArgumentException("Invitation code must not be null");
+    }
+    return rawCode.trim().toUpperCase();
   }
 
   private String sha256(String raw) {

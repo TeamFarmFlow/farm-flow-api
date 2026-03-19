@@ -7,4 +7,8 @@ public class AlreadyFarmMemberException extends DomainException {
   public AlreadyFarmMemberException(String email) {
     super("ALREADY_FARM_MEMBER", HttpStatus.CONFLICT, "Email is already a farm member: " + email);
   }
+
+  public AlreadyFarmMemberException() {
+    super("ALREADY_FARM_MEMBER", HttpStatus.CONFLICT, "already a farm member");
+  }
 }

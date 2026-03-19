@@ -29,7 +29,6 @@ public class FarmInvitationController {
     farmInvitationService.createInvitation(request.toCommand(), farmId, userId);
   }
 
-  // 초대 승인
   @Operation(summary = "초대 승인")
   @PostMapping("/accept")
   public void acceptInvitation(
@@ -41,5 +40,4 @@ public class FarmInvitationController {
   // 초대 목록 조회
 
   // 초대 취소
-
 }

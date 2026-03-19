@@ -1,17 +1,15 @@
 package com.example.app.invitation.application;
 
-import com.example.app.farm.domain.Farm;
-import com.example.app.farm.domain.FarmRepository;
-import com.example.app.farm.domain.FarmUserRepository;
+import com.example.app.farm.domain.*;
+import com.example.app.farm.domain.enums.FarmStatus;
+import com.example.app.farm.domain.enums.FarmUserStatus;
 import com.example.app.farm.domain.exception.FarmNotFoundException;
 import com.example.app.invitation.application.command.FarmInvitationAcceptCommand;
 import com.example.app.invitation.application.command.FarmInvitationRegisterCommand;
 import com.example.app.invitation.domain.FarmInvitation;
 import com.example.app.invitation.domain.FarmInvitationRepository;
 import com.example.app.invitation.domain.enums.FarmInvitationStatus;
-import com.example.app.invitation.domain.exception.AlreadyFarmInvitedException;
-import com.example.app.invitation.domain.exception.AlreadyFarmMemberException;
-import com.example.app.invitation.domain.exception.InviterNotFoundException;
+import com.example.app.invitation.domain.exception.*;
 import com.example.app.role.domain.Role;
 import com.example.app.role.domain.RoleRepository;
 import com.example.app.role.domain.enums.SystemRolePreset;
@@ -39,7 +37,9 @@ public class FarmInvitationService {
   @Transactional
   public void createInvitation(FarmInvitationRegisterCommand command, Long farmId, Long userId) {
     Farm farm =
-        farmRepository.findById(farmId).orElseThrow(() -> new FarmNotFoundException(farmId));
+        farmRepository
+            .findByIdAndStatus(farmId, FarmStatus.ACTIVE)
+            .orElseThrow(() -> new FarmNotFoundException(farmId));
 
     User inviter =
         farmUserRepository
@@ -48,23 +48,10 @@ public class FarmInvitationService {
 
     String inviteeEmail = command.email().trim().toLowerCase();
 
-    boolean alreadyMember = farmUserRepository.existsByFarm_IdAndUser_Email(farmId, inviteeEmail);
-
-    if (alreadyMember) {
-      throw new AlreadyFarmMemberException(inviteeEmail);
-    }
-
-    Boolean isInvited =
-        farmInvitationRepository.existsByFarmIdAndInviteeEmailAndStatus(
-            farmId, inviteeEmail, FarmInvitationStatus.INVITED);
-    if (isInvited) {
-      throw new AlreadyFarmInvitedException(inviteeEmail);
-    }
+    validAlreadyInvitated(farmId, inviteeEmail);
 
     Role role = roleRepository.findByFarmIdAndRoleKey(farmId, SystemRolePreset.WORKER.getRoleKey());
-
     InvitationCodeService.InvitationCode code = invitationCodeService.generate();
-
     Instant expiresAt = Instant.now().plus(30, ChronoUnit.MINUTES);
 
     FarmInvitation invitation =
@@ -79,10 +66,77 @@ public class FarmInvitationService {
             .build();
 
     farmInvitationRepository.save(invitation);
-
     invitationMailService.sendInvitationCode(inviteeEmail, code.rawCode());
   }
 
+  private void validAlreadyInvitated(Long farmId, String inviteeEmail) {
+    boolean alreadyMember = farmUserRepository.existsByFarm_IdAndUser_Email(farmId, inviteeEmail);
+    if (alreadyMember) {
+      throw new AlreadyFarmMemberException(inviteeEmail);
+    }
+
+    Boolean isInvited =
+        farmInvitationRepository.existsByFarmIdAndInviteeEmailAndStatus(
+            farmId, inviteeEmail, FarmInvitationStatus.INVITED);
+    if (isInvited) {
+      throw new AlreadyFarmInvitedException(inviteeEmail);
+    }
+  }
+
   @Transactional
-  public void acceptInvitation(FarmInvitationAcceptCommand command, Long userId) {}
+  public void acceptInvitation(FarmInvitationAcceptCommand command, Long userId) {
+    User user =
+        userRepository.findById(userId).orElseThrow(() -> new FarmNotFoundException(userId));
+
+    String codeHash = invitationCodeService.hash(command.code());
+    FarmInvitation invitation =
+        farmInvitationRepository
+            .findByInviteCodeHash(codeHash)
+            .orElseThrow(() -> new InvitationNotFoundException(command.code()));
+
+    Farm farm = validateAcceptableInvitation(invitation, user, userId);
+
+    Role role =
+        roleRepository.findByFarmIdAndRoleKey(farm.getId(), SystemRolePreset.WORKER.getRoleKey());
+
+    FarmUser farmUser =
+        FarmUser.builder()
+            .id(new FarmUserId(farm.getId(), userId))
+            .farm(farm)
+            .user(user)
+            .role(role)
+            .status(FarmUserStatus.ACTIVE)
+            .build();
+    farmUserRepository.save(farmUser);
+
+    invitation.update(FarmInvitationStatus.ACCEPTED, user);
+  }
+
+  private Farm validateAcceptableInvitation(FarmInvitation invitation, User user, Long userId) {
+    if (invitation.getStatus() != FarmInvitationStatus.INVITED) {
+      throw new InvalidInvitationStatusException(invitation.getStatus());
+    }
+
+    if (invitation.getExpiresAt().isBefore(Instant.now())) {
+      throw new InvalidInvitationStatusException(invitation.getStatus());
+    }
+
+    String inviteeEmail = invitation.getInviteeEmail();
+    if (!inviteeEmail.equals(user.getEmail())) {
+      throw new InvitationEmailMismatchException();
+    }
+
+    Long farmId = invitation.getFarm().getId();
+    Farm farm =
+        farmRepository
+            .findByIdAndStatus(farmId, FarmStatus.ACTIVE)
+            .orElseThrow(() -> new FarmNotFoundException(farmId));
+
+    boolean alreadyMember = farmUserRepository.existsByFarm_IdAndUser_Id(farmId, userId);
+    if (alreadyMember) {
+      throw new AlreadyFarmMemberException();
+    }
+
+    return farm;
+  }
 }

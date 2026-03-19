@@ -10,25 +10,27 @@ import org.springframework.data.repository.query.Param;
 public interface FarmUserRepository extends JpaRepository<FarmUser, FarmUserId> {
   @Query(
       """
-              select u
-              from FarmUser fu
-              join fu.user u
-              where fu.farm.id = :farmId
-                and u.deletedAt is null
-            """)
+                      select u
+                      from FarmUser fu
+                      join fu.user u
+                      where fu.farm.id = :farmId
+                        and u.deletedAt is null
+                    """)
   List<User> findUsersByFarmId(@Param("farmId") Long farmId);
 
   @Query(
       """
-        select u
-        from FarmUser fu
-        join fu.user u
-        join fu.role r
-        where fu.farm.id = :farmId
-          and u.id = :userId
-          and r.key = :roleKey
-    """)
+                        select u
+                        from FarmUser fu
+                        join fu.user u
+                        join fu.role r
+                        where fu.farm.id = :farmId
+                          and u.id = :userId
+                          and r.key = :roleKey
+                    """)
   Optional<User> findOwnerUser(Long farmId, Long userId, String roleKey);
 
   boolean existsByFarm_IdAndUser_Email(Long farmId, String email);
+
+  boolean existsByFarm_IdAndUser_Id(Long farmId, Long userId);
 }
