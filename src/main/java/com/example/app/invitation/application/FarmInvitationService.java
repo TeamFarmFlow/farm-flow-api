@@ -10,6 +10,7 @@ import com.example.app.invitation.domain.FarmInvitation;
 import com.example.app.invitation.domain.FarmInvitationRepository;
 import com.example.app.invitation.domain.enums.FarmInvitationStatus;
 import com.example.app.invitation.domain.exception.*;
+import com.example.app.invitation.presentation.dto.response.FarmInvitationResponse;
 import com.example.app.role.domain.Role;
 import com.example.app.role.domain.RoleRepository;
 import com.example.app.role.domain.enums.SystemRolePreset;
@@ -17,7 +18,10 @@ import com.example.app.user.domain.User;
 import com.example.app.user.domain.UserRepository;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -138,5 +142,31 @@ public class FarmInvitationService {
     }
 
     return farm;
+  }
+
+  public Page<FarmInvitationResponse> getFarmInvitations(Long farmId, Long userId, Pageable pageable) {
+    farmRepository.findByIdAndUserId(farmId, userId)
+                    .orElseThrow(() -> new FarmNotFoundException(farmId));
+
+    return farmInvitationRepository.findByFarm_Id(farmId, pageable)
+            .map(i -> new FarmInvitationResponse(
+                    i.getId(),
+                    i.getInviteeEmail(),
+                    i.getAssignedRole().getName(),
+                    i.getStatus(),
+                    i.getRespondedAt(),
+                    i.getInviter().getId(),
+                    i.getInviter().getName(),
+                    i.getInviteeUser() != null ? i.getInviteeUser().getId() : null,
+                    i.getInviteeUser() != null ? i.getInviteeUser().getName() : null,
+                    i.getCreatedAt(),
+                    i.getUpdatedAt()
+            ));
+  }
+
+  @Transactional
+  public void cancleInvitation(Long id) {
+    FarmInvitation invitation = farmInvitationRepository.findById(id).orElseThrow(InvitationNotFoundException::new);
+    invitation.cancle(FarmInvitationStatus.CANCELED);
   }
 }

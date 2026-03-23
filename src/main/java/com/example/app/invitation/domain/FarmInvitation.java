@@ -68,4 +68,8 @@ public class FarmInvitation extends BaseTimeEntity {
     this.inviteeUser = inviteeUser;
     this.respondedAt = Instant.now();
   }
+
+  public void cancle(FarmInvitationStatus status) {
+    this.status = status;
+  }
 }
