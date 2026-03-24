@@ -48,21 +48,20 @@ public class FarmInvitationController {
   @Operation(summary = "초대 목록 조회")
   @GetMapping()
   public ResponseEntity<PageResponse<FarmInvitationResponse>> getFarmInvitations(
-          Authentication authentication,
-          @PathVariable Long farmId,
-          @ParameterObject
+      Authentication authentication,
+      @PathVariable Long farmId,
+      @ParameterObject
           @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC)
-          Pageable pageable
-  ) {
+          Pageable pageable) {
     Long userId = ((CustomUserDetails) authentication.getPrincipal()).getId();
-    Page<FarmInvitationResponse> page = farmInvitationService.getFarmInvitations(farmId, userId, pageable);
+    Page<FarmInvitationResponse> page =
+        farmInvitationService.getFarmInvitations(farmId, userId, pageable);
     return ResponseEntity.ok(PageResponse.from(page));
   }
 
   @Operation(summary = "초대 취소")
   @PutMapping({"{id}"})
-  public void cancleInvitation(
-          @PathVariable Long id){
+  public void cancleInvitation(@PathVariable Long id) {
     farmInvitationService.cancleInvitation(id);
   }
 }

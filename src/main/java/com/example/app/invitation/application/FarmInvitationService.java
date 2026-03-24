@@ -18,7 +18,6 @@ import com.example.app.user.domain.User;
 import com.example.app.user.domain.UserRepository;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -144,12 +143,17 @@ public class FarmInvitationService {
     return farm;
   }
 
-  public Page<FarmInvitationResponse> getFarmInvitations(Long farmId, Long userId, Pageable pageable) {
-    farmRepository.findByIdAndUserId(farmId, userId)
-                    .orElseThrow(() -> new FarmNotFoundException(farmId));
+  public Page<FarmInvitationResponse> getFarmInvitations(
+      Long farmId, Long userId, Pageable pageable) {
+    farmRepository
+        .findByIdAndUserId(farmId, userId)
+        .orElseThrow(() -> new FarmNotFoundException(farmId));
 
-    return farmInvitationRepository.findByFarm_Id(farmId, pageable)
-            .map(i -> new FarmInvitationResponse(
+    return farmInvitationRepository
+        .findByFarm_Id(farmId, pageable)
+        .map(
+            i ->
+                new FarmInvitationResponse(
                     i.getId(),
                     i.getInviteeEmail(),
                     i.getAssignedRole().getName(),
@@ -160,13 +164,13 @@ public class FarmInvitationService {
                     i.getInviteeUser() != null ? i.getInviteeUser().getId() : null,
                     i.getInviteeUser() != null ? i.getInviteeUser().getName() : null,
                     i.getCreatedAt(),
-                    i.getUpdatedAt()
-            ));
+                    i.getUpdatedAt()));
   }
 
   @Transactional
   public void cancleInvitation(Long id) {
-    FarmInvitation invitation = farmInvitationRepository.findById(id).orElseThrow(InvitationNotFoundException::new);
+    FarmInvitation invitation =
+        farmInvitationRepository.findById(id).orElseThrow(InvitationNotFoundException::new);
     invitation.cancle(FarmInvitationStatus.CANCELED);
   }
 }

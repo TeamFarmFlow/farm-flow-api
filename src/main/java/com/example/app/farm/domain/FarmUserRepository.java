@@ -1,5 +1,6 @@
 package com.example.app.farm.domain;
 
+import com.example.app.role.domain.enums.PermissionKey;
 import com.example.app.user.domain.User;
 import java.util.List;
 import java.util.Optional;
@@ -33,4 +34,17 @@ public interface FarmUserRepository extends JpaRepository<FarmUser, FarmUserId> 
   boolean existsByFarm_IdAndUser_Email(Long farmId, String email);
 
   boolean existsByFarm_IdAndUser_Id(Long farmId, Long userId);
+
+  @Query(
+      """
+    select case when count(fu) > 0 then true else false end
+    from FarmUser fu
+    join RolePermission rp on fu.role = rp.role
+    where fu.farm.id = :farmId
+                and fu.user.id = :userId
+                and rp.id.permissionKey = :permissionKey
+    """)
+  boolean existsByUserIdAndPermissionKey(Long farmId, Long userId, PermissionKey permissionKey);
+
+  boolean existsByRole_Id(Long id);
 }

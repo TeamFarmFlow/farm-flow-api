@@ -35,7 +35,7 @@ public class RoleSeedService {
               .map(
                   p ->
                       RolePermission.builder()
-                          .id(new RolePermissionId(role.getId(), p.name()))
+                          .id(new RolePermissionId(role.getId(), p))
                           .role(role)
                           .build())
               .toList();

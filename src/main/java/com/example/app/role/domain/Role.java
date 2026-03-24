@@ -1,6 +1,8 @@
 package com.example.app.role.domain;
 
 import com.example.app.farm.domain.Farm;
+import com.example.app.role.application.command.RoleUpdateCommand;
+import com.example.app.role.domain.enums.PermissionKey;
 import com.example.app.shared.entity.BaseTimeEntity;
 import jakarta.persistence.*;
 import java.util.ArrayList;
@@ -39,4 +41,30 @@ public class Role extends BaseTimeEntity {
 
   @OneToMany(mappedBy = "role", cascade = CascadeType.ALL, orphanRemoval = true)
   private final List<RolePermission> rolePermissions = new ArrayList<>();
+
+  public void addPermission(PermissionKey permissionKey) {
+    boolean exists =
+        this.rolePermissions.stream()
+            .anyMatch(rp -> rp.getId().getPermissionKey().equals(permissionKey));
+
+    if (exists) {
+      return;
+    }
+
+    RolePermission rolePermission =
+        RolePermission.builder()
+            .id(new RolePermissionId(this.id, permissionKey))
+            .role(this)
+            .build();
+
+    this.rolePermissions.add(rolePermission);
+  }
+
+  public void update(RoleUpdateCommand command) {
+    this.name = command.name();
+  }
+
+  public void clearPermissions() {
+    this.rolePermissions.clear();
+  }
 }
