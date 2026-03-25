@@ -10,6 +10,7 @@ import com.example.app.role.domain.*;
 import com.example.app.role.domain.enums.PermissionKey;
 import com.example.app.role.domain.exception.*;
 import com.example.app.role.presentation.response.RoleRegisterResponse;
+import com.example.app.role.presentation.response.RoleResponse;
 import com.example.app.role.presentation.response.RoleUpdateResponse;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -63,6 +64,31 @@ public class RoleService {
 
     return new RoleRegisterResponse(
         savedRole.getId(), savedRole.getName(), savedRole.getKey(), permissions);
+  }
+
+  public List<RoleResponse> getRoles(Long farmId, Long userId) {
+    Farm farm =
+            farmRepository.findById(farmId).orElseThrow(() -> new FarmNotFoundException(farmId));
+
+    boolean isManageRoles =
+            farmUserRepository.existsByUserIdAndPermissionKey(
+                    farmId, userId, PermissionKey.MANAGE_ROLES);
+    if (!isManageRoles) {
+      throw new RolePermissionDeniedException();
+    }
+
+    List<Role> roles = roleRepository.findByFarmId(farmId);
+
+    return roles.stream()
+            .map(role -> new RoleResponse(
+                    role.getId(),
+                    role.getName(),
+                    role.getKey(),
+                    role.getRolePermissions().stream()
+                            .map(rp -> rp.getId().getPermissionKey())
+                            .toList()
+            ))
+            .toList();
   }
 
   @Transactional

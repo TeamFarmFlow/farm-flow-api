@@ -5,6 +5,7 @@ import com.example.app.role.application.RoleService;
 import com.example.app.role.presentation.request.RoleRegisterRequest;
 import com.example.app.role.presentation.request.RoleUpdateRequest;
 import com.example.app.role.presentation.response.RoleRegisterResponse;
+import com.example.app.role.presentation.response.RoleResponse;
 import com.example.app.role.presentation.response.RoleUpdateResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -14,10 +15,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Tag(name = "역할 관리")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/farms/{farmId}/role")
+@RequestMapping("/farms/{farmId}/roles")
 public class RoleController {
 
   private final RoleService roleService;
@@ -32,7 +35,13 @@ public class RoleController {
     return ResponseEntity.ok(roleService.register(request.toCommand(), farmId, userId));
   }
 
-  // 역할 조회
+  @Operation(summary = "역할 조회")
+  @GetMapping
+  public ResponseEntity<List<RoleResponse>> getRoles(@PathVariable Long farmId,
+                                               Authentication authentication){
+    Long userId = ((CustomUserDetails) authentication.getPrincipal()).getId();
+    return ResponseEntity.ok(roleService.getRoles(farmId, userId));
+  }
 
   @Operation(summary = "역할 수정")
   @PutMapping("{id}")

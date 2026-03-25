@@ -1,5 +1,10 @@
 package com.example.app.role.domain;
 
+import com.example.app.role.domain.enums.PermissionKey;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface RolePermissionRepository extends JpaRepository<RolePermission, RolePermissionId> {}
+import java.util.List;
+
+public interface RolePermissionRepository extends JpaRepository<RolePermission, RolePermissionId> {
+
+}
