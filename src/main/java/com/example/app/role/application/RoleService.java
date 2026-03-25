@@ -2,8 +2,8 @@ package com.example.app.role.application;
 
 import com.example.app.farm.domain.Farm;
 import com.example.app.farm.domain.FarmRepository;
-import com.example.app.farm.domain.FarmUserRepository;
 import com.example.app.farm.domain.exception.FarmNotFoundException;
+import com.example.app.farmUser.domain.FarmUserRepository;
 import com.example.app.role.application.command.RoleRegisterCommand;
 import com.example.app.role.application.command.RoleUpdateCommand;
 import com.example.app.role.domain.*;
@@ -68,11 +68,11 @@ public class RoleService {
 
   public List<RoleResponse> getRoles(Long farmId, Long userId) {
     Farm farm =
-            farmRepository.findById(farmId).orElseThrow(() -> new FarmNotFoundException(farmId));
+        farmRepository.findById(farmId).orElseThrow(() -> new FarmNotFoundException(farmId));
 
     boolean isManageRoles =
-            farmUserRepository.existsByUserIdAndPermissionKey(
-                    farmId, userId, PermissionKey.MANAGE_ROLES);
+        farmUserRepository.existsByUserIdAndPermissionKey(
+            farmId, userId, PermissionKey.MANAGE_ROLES);
     if (!isManageRoles) {
       throw new RolePermissionDeniedException();
     }
@@ -80,15 +80,16 @@ public class RoleService {
     List<Role> roles = roleRepository.findByFarmId(farmId);
 
     return roles.stream()
-            .map(role -> new RoleResponse(
+        .map(
+            role ->
+                new RoleResponse(
                     role.getId(),
                     role.getName(),
                     role.getKey(),
                     role.getRolePermissions().stream()
-                            .map(rp -> rp.getId().getPermissionKey())
-                            .toList()
-            ))
-            .toList();
+                        .map(rp -> rp.getId().getPermissionKey())
+                        .toList()))
+        .toList();
   }
 
   @Transactional

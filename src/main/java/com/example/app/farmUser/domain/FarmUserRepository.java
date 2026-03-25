@@ -1,4 +1,4 @@
-package com.example.app.farm.domain;
+package com.example.app.farmUser.domain;
 
 import com.example.app.role.domain.enums.PermissionKey;
 import com.example.app.user.domain.User;

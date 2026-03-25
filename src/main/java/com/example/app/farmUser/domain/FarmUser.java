@@ -1,6 +1,7 @@
-package com.example.app.farm.domain;
+package com.example.app.farmUser.domain;
 
-import com.example.app.farm.domain.enums.FarmUserStatus;
+import com.example.app.farm.domain.Farm;
+import com.example.app.farmUser.domain.enums.FarmUserStatus;
 import com.example.app.role.domain.Role;
 import com.example.app.shared.entity.BaseTimeEntity;
 import com.example.app.user.domain.User;

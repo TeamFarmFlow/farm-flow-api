@@ -4,13 +4,16 @@ import com.example.app.farm.application.command.FarmRegisterCommand;
 import com.example.app.farm.application.command.FarmUpdateCommand;
 import com.example.app.farm.domain.*;
 import com.example.app.farm.domain.enums.FarmStatus;
-import com.example.app.farm.domain.enums.FarmUserStatus;
 import com.example.app.farm.domain.exception.FarmNotFoundException;
 import com.example.app.farm.presentation.dto.response.FarmDetailResponse;
 import com.example.app.farm.presentation.dto.response.FarmListResponse;
-import com.example.app.farm.presentation.dto.response.FarmMemberResponse;
 import com.example.app.farm.presentation.dto.response.FarmRegisterResponse;
 import com.example.app.farm.presentation.dto.response.FarmUpdateResponse;
+import com.example.app.farmUser.domain.FarmUser;
+import com.example.app.farmUser.domain.FarmUserId;
+import com.example.app.farmUser.domain.FarmUserRepository;
+import com.example.app.farmUser.domain.enums.FarmUserStatus;
+import com.example.app.farmUser.presentation.response.FarmUserResponse;
 import com.example.app.role.application.RoleSeedService;
 import com.example.app.role.domain.Role;
 import com.example.app.user.domain.User;
@@ -71,9 +74,9 @@ public class FarmService {
             .findByIdAndUserId(id, userId)
             .orElseThrow(() -> new FarmNotFoundException(id));
 
-    List<FarmMemberResponse> members =
+    List<FarmUserResponse> members =
         farmUserRepository.findUsersByFarmId(id).stream()
-            .map(u -> new FarmMemberResponse(u.getId(), u.getName(), u.getEmail(), u.getStatus()))
+            .map(u -> new FarmUserResponse(u.getId(), u.getName(), u.getEmail(), u.getStatus()))
             .toList();
 
     return new FarmDetailResponse(

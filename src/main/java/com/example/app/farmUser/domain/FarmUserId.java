@@ -1,4 +1,4 @@
-package com.example.app.farm.domain;
+package com.example.app.farmUser.domain;
 
 import jakarta.persistence.Embeddable;
 import java.io.Serializable;

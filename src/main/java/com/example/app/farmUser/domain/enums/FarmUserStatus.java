@@ -1,4 +1,4 @@
-package com.example.app.farm.domain.enums;
+package com.example.app.farmUser.domain.enums;
 
 public enum FarmUserStatus {
   ACTIVE,

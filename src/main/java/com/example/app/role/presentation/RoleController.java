@@ -10,12 +10,11 @@ import com.example.app.role.presentation.response.RoleUpdateResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @Tag(name = "역할 관리")
 @RestController
@@ -37,8 +36,8 @@ public class RoleController {
 
   @Operation(summary = "역할 조회")
   @GetMapping
-  public ResponseEntity<List<RoleResponse>> getRoles(@PathVariable Long farmId,
-                                               Authentication authentication){
+  public ResponseEntity<List<RoleResponse>> getRoles(
+      @PathVariable Long farmId, Authentication authentication) {
     Long userId = ((CustomUserDetails) authentication.getPrincipal()).getId();
     return ResponseEntity.ok(roleService.getRoles(farmId, userId));
   }

@@ -2,8 +2,11 @@ package com.example.app.invitation.application;
 
 import com.example.app.farm.domain.*;
 import com.example.app.farm.domain.enums.FarmStatus;
-import com.example.app.farm.domain.enums.FarmUserStatus;
 import com.example.app.farm.domain.exception.FarmNotFoundException;
+import com.example.app.farmUser.domain.FarmUser;
+import com.example.app.farmUser.domain.FarmUserId;
+import com.example.app.farmUser.domain.FarmUserRepository;
+import com.example.app.farmUser.domain.enums.FarmUserStatus;
 import com.example.app.invitation.application.command.FarmInvitationAcceptCommand;
 import com.example.app.invitation.application.command.FarmInvitationRegisterCommand;
 import com.example.app.invitation.domain.FarmInvitation;

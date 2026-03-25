@@ -1,6 +1,7 @@
 package com.example.app.farm.presentation.dto.response;
 
 import com.example.app.farm.domain.enums.FarmStatus;
+import com.example.app.farmUser.presentation.response.FarmUserResponse;
 import java.time.Instant;
 import java.util.List;
 
@@ -10,4 +11,4 @@ public record FarmDetailResponse(
     FarmStatus status,
     Instant createdAt,
     Instant updatedAt,
-    List<FarmMemberResponse> members) {}
+    List<FarmUserResponse> members) {}
