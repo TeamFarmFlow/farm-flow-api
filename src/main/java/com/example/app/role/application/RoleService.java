@@ -32,7 +32,7 @@ public class RoleService {
         farmRepository.findById(farmId).orElseThrow(() -> new FarmNotFoundException(farmId));
 
     boolean isManageRoles =
-        farmUserRepository.existsByUserIdAndPermissionKey(
+        farmUserRepository.existsByFarmIdAndUserIdAndPermissionKey(
             farmId, userId, PermissionKey.MANAGE_ROLES);
     if (!isManageRoles) {
       throw new RolePermissionDeniedException();
@@ -71,7 +71,7 @@ public class RoleService {
         farmRepository.findById(farmId).orElseThrow(() -> new FarmNotFoundException(farmId));
 
     boolean isManageRoles =
-        farmUserRepository.existsByUserIdAndPermissionKey(
+        farmUserRepository.existsByFarmIdAndUserIdAndPermissionKey(
             farmId, userId, PermissionKey.MANAGE_ROLES);
     if (!isManageRoles) {
       throw new RolePermissionDeniedException();
@@ -95,7 +95,7 @@ public class RoleService {
   @Transactional
   public RoleUpdateResponse update(Long id, RoleUpdateCommand command, Long farmId, Long userId) {
     boolean isManageRoles =
-        farmUserRepository.existsByUserIdAndPermissionKey(
+        farmUserRepository.existsByFarmIdAndUserIdAndPermissionKey(
             farmId, userId, PermissionKey.MANAGE_ROLES);
     if (!isManageRoles) {
       throw new RolePermissionDeniedException();
@@ -120,7 +120,7 @@ public class RoleService {
   @Transactional
   public void delete(Long id, Long farmId, Long userId) {
     boolean isManageRoles =
-        farmUserRepository.existsByUserIdAndPermissionKey(
+        farmUserRepository.existsByFarmIdAndUserIdAndPermissionKey(
             farmId, userId, PermissionKey.MANAGE_ROLES);
     if (!isManageRoles) {
       throw new RolePermissionDeniedException();

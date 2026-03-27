@@ -31,4 +31,6 @@ public interface FarmRepository extends JpaRepository<Farm, Long> {
   Optional<Farm> findByIdAndUserId(Long id, Long userId);
 
   Optional<Farm> findByIdAndStatus(Long farmId, FarmStatus farmStatus);
+
+  boolean existsByIdAndStatus(Long farmId, FarmStatus farmStatus);
 }

@@ -1,5 +1,8 @@
 package com.example.app.farmUser.domain;
 
+import com.example.app.farmUser.domain.enums.FarmUserStatus;
+import com.example.app.farmUser.presentation.response.FarmUserResponse;
+import com.example.app.farmUser.presentation.response.FarmUserRoleUpdateResponse;
 import com.example.app.role.domain.enums.PermissionKey;
 import com.example.app.user.domain.User;
 import java.util.List;
@@ -11,13 +14,20 @@ import org.springframework.data.repository.query.Param;
 public interface FarmUserRepository extends JpaRepository<FarmUser, FarmUserId> {
   @Query(
       """
-                      select u
-                      from FarmUser fu
-                      join fu.user u
-                      where fu.farm.id = :farmId
-                        and u.deletedAt is null
+                       select
+                            u.id as id,
+                            u.name as name,
+                            u.email as email,
+                            fu.status as status,
+                            r.name as roleName,
+                            r.id as roleId
+                          from FarmUser fu
+                          join fu.user u
+                          join fu.role r
+                          where fu.farm.id = :farmId
+                            and u.deletedAt is null
                     """)
-  List<User> findUsersByFarmId(@Param("farmId") Long farmId);
+  List<FarmUserResponse> findUsersByFarmId(@Param("farmId") Long farmId);
 
   @Query(
       """
@@ -44,7 +54,29 @@ public interface FarmUserRepository extends JpaRepository<FarmUser, FarmUserId> 
                 and fu.user.id = :userId
                 and rp.id.permissionKey = :permissionKey
     """)
-  boolean existsByUserIdAndPermissionKey(Long farmId, Long userId, PermissionKey permissionKey);
+  boolean existsByFarmIdAndUserIdAndPermissionKey(
+      Long farmId, Long userId, PermissionKey permissionKey);
 
   boolean existsByRole_Id(Long id);
+
+  Optional<FarmUser> findByFarm_IdAndUser_IdAndStatus(
+      Long farmId, Long targetUserId, FarmUserStatus farmUserStatus);
+
+  @Query(
+      """
+                           select
+                                u.id as id,
+                                u.name as name,
+                                r.name as roleName,
+                                r.id as roleId
+                              from FarmUser fu
+                              join fu.user u
+                              join fu.role r
+                              where fu.farm.id = :farmId
+                                and u.id = :userId
+                                and u.deletedAt is null
+                        """)
+  FarmUserRoleUpdateResponse findRoleUpdateInfoByFarmIdAndUserId(Long farmId, Long userId);
+
+  Optional<FarmUser> findByFarm_IdAndUser_Id(Long farmId, Long id);
 }

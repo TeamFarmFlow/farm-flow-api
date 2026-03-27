@@ -76,7 +76,10 @@ public class FarmService {
 
     List<FarmUserResponse> members =
         farmUserRepository.findUsersByFarmId(id).stream()
-            .map(u -> new FarmUserResponse(u.getId(), u.getName(), u.getEmail(), u.getStatus()))
+            .map(
+                u ->
+                    new FarmUserResponse(
+                        u.id(), u.name(), u.email(), u.status(), u.roleName(), u.roleId()))
             .toList();
 
     return new FarmDetailResponse(

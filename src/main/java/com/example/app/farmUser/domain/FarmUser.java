@@ -42,4 +42,12 @@ public class FarmUser extends BaseTimeEntity {
     this.user = user;
     this.status = FarmUserStatus.ACTIVE;
   }
+
+  public void updateRole(Role role) {
+    this.role = role;
+  }
+
+  public void updateStatus(FarmUserStatus status) {
+    this.status = status;
+  }
 }
