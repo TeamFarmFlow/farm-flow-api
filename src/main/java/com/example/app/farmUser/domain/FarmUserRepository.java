@@ -79,4 +79,6 @@ public interface FarmUserRepository extends JpaRepository<FarmUser, FarmUserId> 
   FarmUserRoleUpdateResponse findRoleUpdateInfoByFarmIdAndUserId(Long farmId, Long userId);
 
   Optional<FarmUser> findByFarm_IdAndUser_Id(Long farmId, Long id);
+
+  boolean existsByFarm_IdAndUser_IdAndStatus(Long farmId, Long userId, FarmUserStatus farmUserStatus);
 }

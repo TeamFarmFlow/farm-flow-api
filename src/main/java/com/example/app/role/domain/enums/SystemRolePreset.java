@@ -25,11 +25,7 @@ public enum SystemRolePreset {
   WORKER(
       "WORKER",
       "근로자",
-      Set.of(
-          PermissionKey.ATTENDANCE_CHECK_IN,
-          PermissionKey.ATTENDANCE_CHECK_OUT,
-          PermissionKey.ROOM_READING_READ,
-          PermissionKey.CYCLE_READ));
+      Set.of(PermissionKey.ROOM_READING_READ, PermissionKey.CYCLE_READ));
 
   private final String roleKey;
   private final String roleName;

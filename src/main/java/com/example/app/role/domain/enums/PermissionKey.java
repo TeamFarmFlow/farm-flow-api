@@ -4,8 +4,6 @@ import lombok.Getter;
 
 @Getter
 public enum PermissionKey {
-  ATTENDANCE_CHECK_IN,
-  ATTENDANCE_CHECK_OUT,
   ATTENDANCE_MANAGE,
 
   ROOM_READING_CREATE,
