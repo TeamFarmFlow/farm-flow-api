@@ -37,8 +37,8 @@ public class FarmUserService {
     }
 
     boolean isManageMember =
-        farmUserRepository.existsByFarmIdAndUserIdAndPermissionKey(
-            farmId, userId, PermissionKey.MANAGE_MEMBERS);
+        farmUserRepository.existsByFarmIdAndUserIdAndStatusAndPermissionKey(
+            farmId, userId, FarmUserStatus.ACTIVE, PermissionKey.MANAGE_MEMBERS);
     if (!isManageMember) {
       throw new MemberPermissionDeniedException();
     }
@@ -60,8 +60,8 @@ public class FarmUserService {
     }
 
     boolean isManageMember =
-        farmUserRepository.existsByFarmIdAndUserIdAndPermissionKey(
-            farmId, userId, PermissionKey.MANAGE_MEMBERS);
+        farmUserRepository.existsByFarmIdAndUserIdAndStatusAndPermissionKey(
+            farmId, userId, FarmUserStatus.ACTIVE, PermissionKey.MANAGE_MEMBERS);
     if (!isManageMember) {
       throw new MemberPermissionDeniedException();
     }
@@ -86,8 +86,8 @@ public class FarmUserService {
     }
 
     boolean isManageMember =
-        farmUserRepository.existsByFarmIdAndUserIdAndPermissionKey(
-            farmId, userId, PermissionKey.MANAGE_MEMBERS);
+        farmUserRepository.existsByFarmIdAndUserIdAndStatusAndPermissionKey(
+            farmId, userId, FarmUserStatus.ACTIVE, PermissionKey.MANAGE_MEMBERS);
     if (!isManageMember) {
       throw new MemberPermissionDeniedException();
     }

@@ -52,10 +52,11 @@ public interface FarmUserRepository extends JpaRepository<FarmUser, FarmUserId> 
     join RolePermission rp on fu.role = rp.role
     where fu.farm.id = :farmId
                 and fu.user.id = :userId
+                and fu.status = :status
                 and rp.id.permissionKey = :permissionKey
     """)
-  boolean existsByFarmIdAndUserIdAndPermissionKey(
-      Long farmId, Long userId, PermissionKey permissionKey);
+  boolean existsByFarmIdAndUserIdAndStatusAndPermissionKey(
+      Long farmId, Long userId, FarmUserStatus status, PermissionKey permissionKey);
 
   boolean existsByRole_Id(Long id);
 

@@ -4,6 +4,7 @@ import com.example.app.farm.domain.Farm;
 import com.example.app.farm.domain.FarmRepository;
 import com.example.app.farm.domain.exception.FarmNotFoundException;
 import com.example.app.farmUser.domain.FarmUserRepository;
+import com.example.app.farmUser.domain.enums.FarmUserStatus;
 import com.example.app.role.application.command.RoleRegisterCommand;
 import com.example.app.role.application.command.RoleUpdateCommand;
 import com.example.app.role.domain.*;
@@ -32,8 +33,8 @@ public class RoleService {
         farmRepository.findById(farmId).orElseThrow(() -> new FarmNotFoundException(farmId));
 
     boolean isManageRoles =
-        farmUserRepository.existsByFarmIdAndUserIdAndPermissionKey(
-            farmId, userId, PermissionKey.MANAGE_ROLES);
+        farmUserRepository.existsByFarmIdAndUserIdAndStatusAndPermissionKey(
+            farmId, userId, FarmUserStatus.ACTIVE, PermissionKey.MANAGE_ROLES);
     if (!isManageRoles) {
       throw new RolePermissionDeniedException();
     }
@@ -71,8 +72,8 @@ public class RoleService {
         farmRepository.findById(farmId).orElseThrow(() -> new FarmNotFoundException(farmId));
 
     boolean isManageRoles =
-        farmUserRepository.existsByFarmIdAndUserIdAndPermissionKey(
-            farmId, userId, PermissionKey.MANAGE_ROLES);
+        farmUserRepository.existsByFarmIdAndUserIdAndStatusAndPermissionKey(
+            farmId, userId, FarmUserStatus.ACTIVE, PermissionKey.MANAGE_ROLES);
     if (!isManageRoles) {
       throw new RolePermissionDeniedException();
     }
@@ -95,8 +96,8 @@ public class RoleService {
   @Transactional
   public RoleUpdateResponse update(Long id, RoleUpdateCommand command, Long farmId, Long userId) {
     boolean isManageRoles =
-        farmUserRepository.existsByFarmIdAndUserIdAndPermissionKey(
-            farmId, userId, PermissionKey.MANAGE_ROLES);
+        farmUserRepository.existsByFarmIdAndUserIdAndStatusAndPermissionKey(
+            farmId, userId, FarmUserStatus.ACTIVE, PermissionKey.MANAGE_ROLES);
     if (!isManageRoles) {
       throw new RolePermissionDeniedException();
     }
@@ -120,8 +121,8 @@ public class RoleService {
   @Transactional
   public void delete(Long id, Long farmId, Long userId) {
     boolean isManageRoles =
-        farmUserRepository.existsByFarmIdAndUserIdAndPermissionKey(
-            farmId, userId, PermissionKey.MANAGE_ROLES);
+        farmUserRepository.existsByFarmIdAndUserIdAndStatusAndPermissionKey(
+            farmId, userId, FarmUserStatus.ACTIVE, PermissionKey.MANAGE_ROLES);
     if (!isManageRoles) {
       throw new RolePermissionDeniedException();
     }
