@@ -5,6 +5,7 @@ import com.example.app.attendance.domain.AttendanceRepository;
 import com.example.app.attendance.domain.exception.AlreadyClockedInException;
 import com.example.app.attendance.domain.exception.AlreadyClockedOutException;
 import com.example.app.attendance.domain.exception.AttendanceNotFoundException;
+import com.example.app.core.exception.DomainException;
 import com.example.app.attendance.presetation.dto.response.AttendanceResponse;
 import com.example.app.farm.domain.Farm;
 import com.example.app.farm.domain.FarmRepository;
@@ -20,9 +21,11 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.Objects;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -113,5 +116,39 @@ public class AttendanceService {
         attendance.getClockInAt(),
         attendance.getClockOutAt(),
         attendance.getStatus());
+  }
+
+  public List<AttendanceResponse> getMyAttendances(Long farmId, Long userId, LocalDate from, LocalDate to) {
+    if (from.isAfter(to)) {
+      throw new DomainException(
+          "INVALID_ATTENDANCE_DATE_RANGE",
+          HttpStatus.BAD_REQUEST,
+          "from must be less than or equal to to") {};
+    }
+
+    farmRepository
+            .findByIdAndStatus(farmId, FarmStatus.ACTIVE)
+            .orElseThrow(() -> new FarmNotFoundException(farmId));
+
+    boolean existsFarmUser =
+            farmUserRepository.existsByFarm_IdAndUser_IdAndStatus(
+                    farmId, userId, FarmUserStatus.ACTIVE);
+    if (!existsFarmUser) {
+      throw new FarmUserNotFoundException(userId);
+    }
+
+    List<Attendance> attendances = attendanceRepository.findAllByFarm_IdAndUser_IdAndWorkDateBetweenOrderByWorkDateDesc(farmId, userId, from, to);
+
+    User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
+
+    return attendances.stream().map(attendance -> new AttendanceResponse(
+            attendance.getId(),
+            user.getId(),
+            user.getName(),
+            attendance.getWorkDate(),
+            attendance.getClockInAt(),
+            attendance.getClockOutAt(),
+            attendance.getStatus()
+    )).toList();
   }
 }

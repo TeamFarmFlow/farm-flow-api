@@ -8,21 +8,21 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
+import java.util.List;
 
 @Tag(name = "출퇴근")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("{farmId}/attendance")
+@RequestMapping("{farmId}/attendances")
 public class AttendanceController {
 
     private final AttendanceService attendanceService;
 
     @Operation(summary = "출근")
-    @PutMapping("clock-in")
+    @PutMapping("/clock-in")
     public ResponseEntity<AttendanceResponse> clockIn(@PathVariable("farmId") Long farmId,
                                                       Authentication authentication) {
         Long userId = ((CustomUserDetails) authentication.getPrincipal()).getId();
@@ -30,16 +30,23 @@ public class AttendanceController {
     }
 
     @Operation(summary = "퇴근")
-    @PutMapping("clock-out")
+    @PutMapping("/clock-out")
     public ResponseEntity<AttendanceResponse> clockOut(@PathVariable("farmId") Long farmId,
                                                        Authentication authentication){
         Long userId = ((CustomUserDetails) authentication.getPrincipal()).getId();
         return ResponseEntity.ok(attendanceService.clockOut(farmId, userId));
     }
 
-
     // 내 출퇴근 조회
-
+    @Operation(summary = "내 출퇴근 조회")
+    @GetMapping("/me")
+    public ResponseEntity<List<AttendanceResponse>> getMyAttendances(@PathVariable("farmId") Long farmId,
+                                                                  @RequestParam LocalDate from,
+                                                                  @RequestParam LocalDate to,
+                                                                  Authentication authentication) {
+        Long userId = ((CustomUserDetails) authentication.getPrincipal()).getId();
+        return ResponseEntity.ok(attendanceService.getMyAttendances(farmId, userId, from, to));
+    }
 
     // 관리자 - 출퇴근 조회
 
