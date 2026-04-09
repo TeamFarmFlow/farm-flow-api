@@ -11,7 +11,7 @@ import com.example.app.attendance.domain.exception.AttendanceNotFoundException;
 import com.example.app.attendance.domain.exception.InvalidAttendanceAdjustmentReasonException;
 import com.example.app.attendance.domain.exception.InvalidAttendanceDateRangeException;
 import com.example.app.attendance.domain.exception.InvalidAttendanceTimeRangeException;
-import com.example.app.attendance.presetation.dto.response.AttendanceResponse;
+import com.example.app.attendance.presentation.dto.response.AttendanceResponse;
 import com.example.app.farm.domain.Farm;
 import com.example.app.farm.domain.FarmRepository;
 import com.example.app.farm.domain.enums.FarmStatus;

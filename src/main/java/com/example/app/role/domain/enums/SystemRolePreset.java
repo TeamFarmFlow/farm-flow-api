@@ -10,6 +10,7 @@ public enum SystemRolePreset {
       "농장주",
       Set.of(
           PermissionKey.ATTENDANCE_MANAGE,
+          PermissionKey.ROOM_MANAGE,
           PermissionKey.ROOM_READING_CREATE,
           PermissionKey.ROOM_READING_UPDATE,
           PermissionKey.ROOM_READING_DELETE,

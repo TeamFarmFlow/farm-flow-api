@@ -2,6 +2,7 @@ package com.example.app.farm.domain;
 
 import com.example.app.farm.domain.enums.FarmStatus;
 import com.example.app.farmUser.domain.FarmUser;
+import com.example.app.room.domain.Room;
 import com.example.app.shared.entity.BaseTimeEntity;
 import com.example.app.user.domain.User;
 import jakarta.persistence.CascadeType;
@@ -48,6 +49,9 @@ public class Farm extends BaseTimeEntity {
 
   @OneToMany(mappedBy = "farm", cascade = CascadeType.ALL, orphanRemoval = true)
   private final List<FarmUser> farmUsers = new ArrayList<>();
+
+  @OneToMany(mappedBy = "farm", cascade = CascadeType.ALL, orphanRemoval = true)
+  private final List<Room> rooms = new ArrayList<>();
 
   public void addFarmUser(User user) {
     FarmUser farmUser = new FarmUser(this, user);

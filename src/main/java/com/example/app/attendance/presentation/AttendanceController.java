@@ -1,8 +1,8 @@
-package com.example.app.attendance.presetation;
+package com.example.app.attendance.presentation;
 
 import com.example.app.attendance.application.AttendanceService;
-import com.example.app.attendance.presetation.dto.request.AttendanceUpdateRequest;
-import com.example.app.attendance.presetation.dto.response.AttendanceResponse;
+import com.example.app.attendance.presentation.dto.request.AttendanceUpdateRequest;
+import com.example.app.attendance.presentation.dto.response.AttendanceResponse;
 import com.example.app.core.jwt.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

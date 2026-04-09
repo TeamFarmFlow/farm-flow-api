@@ -1,4 +1,4 @@
-package com.example.app.attendance.presetation.dto.request;
+package com.example.app.attendance.presentation.dto.request;
 
 import com.example.app.attendance.application.command.AttendanceUpdateCommand;
 import java.time.LocalDateTime;

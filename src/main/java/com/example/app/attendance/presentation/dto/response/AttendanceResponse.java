@@ -1,4 +1,4 @@
-package com.example.app.attendance.presetation.dto.response;
+package com.example.app.attendance.presentation.dto.response;
 
 import com.example.app.attendance.domain.enums.AttendanceStatus;
 
