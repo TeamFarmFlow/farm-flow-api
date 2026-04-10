@@ -32,9 +32,9 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
-import org.springframework.util.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 @Service
 @RequiredArgsConstructor
@@ -72,7 +72,8 @@ public class AttendanceService {
       throw new AlreadyClockedInException();
     }
 
-    User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
+    User user =
+        userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
 
     Attendance attendance = Attendance.clockIn(farm, user, workDate, clockInAt);
     attendanceRepository.save(attendance);
@@ -124,47 +125,54 @@ public class AttendanceService {
         attendance.getStatus());
   }
 
-  public List<AttendanceResponse> getMyAttendances(Long farmId, Long userId, LocalDate from, LocalDate to) {
+  public List<AttendanceResponse> getMyAttendances(
+      Long farmId, Long userId, LocalDate from, LocalDate to) {
     if (from.isAfter(to)) {
       throw new InvalidAttendanceDateRangeException();
     }
 
     farmRepository
-            .findByIdAndStatus(farmId, FarmStatus.ACTIVE)
-            .orElseThrow(() -> new FarmNotFoundException(farmId));
+        .findByIdAndStatus(farmId, FarmStatus.ACTIVE)
+        .orElseThrow(() -> new FarmNotFoundException(farmId));
 
     boolean existsFarmUser =
-            farmUserRepository.existsByFarm_IdAndUser_IdAndStatus(
-                    farmId, userId, FarmUserStatus.ACTIVE);
+        farmUserRepository.existsByFarm_IdAndUser_IdAndStatus(
+            farmId, userId, FarmUserStatus.ACTIVE);
     if (!existsFarmUser) {
       throw new FarmUserNotFoundException(userId);
     }
 
-    List<Attendance> attendances = attendanceRepository.findAllByFarm_IdAndUser_IdAndWorkDateBetweenOrderByWorkDateDesc(farmId, userId, from, to);
+    List<Attendance> attendances =
+        attendanceRepository.findAllByFarm_IdAndUser_IdAndWorkDateBetweenOrderByWorkDateDesc(
+            farmId, userId, from, to);
 
-    return attendances.stream().map(attendance -> new AttendanceResponse(
-            attendance.getId(),
-            attendance.getUser().getId(),
-            attendance.getUser().getName(),
-            attendance.getWorkDate(),
-            attendance.getClockInAt(),
-            attendance.getClockOutAt(),
-            attendance.getStatus()
-    )).toList();
+    return attendances.stream()
+        .map(
+            attendance ->
+                new AttendanceResponse(
+                    attendance.getId(),
+                    attendance.getUser().getId(),
+                    attendance.getUser().getName(),
+                    attendance.getWorkDate(),
+                    attendance.getClockInAt(),
+                    attendance.getClockOutAt(),
+                    attendance.getStatus()))
+        .toList();
   }
 
-  public List<AttendanceResponse> getAttendances(Long farmId, Long userId, LocalDate from, LocalDate to) {
+  public List<AttendanceResponse> getAttendances(
+      Long farmId, Long userId, LocalDate from, LocalDate to) {
     if (from.isAfter(to)) {
       throw new InvalidAttendanceDateRangeException();
     }
 
     farmRepository
-            .findByIdAndStatus(farmId, FarmStatus.ACTIVE)
-            .orElseThrow(() -> new FarmNotFoundException(farmId));
+        .findByIdAndStatus(farmId, FarmStatus.ACTIVE)
+        .orElseThrow(() -> new FarmNotFoundException(farmId));
 
     boolean isManageMember =
-            farmUserRepository.existsByFarmIdAndUserIdAndStatusAndPermissionKey(
-                    farmId, userId, FarmUserStatus.ACTIVE, PermissionKey.ATTENDANCE_MANAGE);
+        farmUserRepository.existsByFarmIdAndUserIdAndStatusAndPermissionKey(
+            farmId, userId, FarmUserStatus.ACTIVE, PermissionKey.ATTENDANCE_MANAGE);
     if (!isManageMember) {
       throw new MemberPermissionDeniedException();
     }
@@ -173,26 +181,30 @@ public class AttendanceService {
         attendanceRepository.findAllByFarmIdAndWorkDateBetweenOrderByWorkDateDescWithUser(
             farmId, from, to);
 
-    return attendances.stream().map(attendance -> new AttendanceResponse(
-            attendance.getId(),
-            attendance.getUser().getId(),
-            attendance.getUser().getName(),
-            attendance.getWorkDate(),
-            attendance.getClockInAt(),
-            attendance.getClockOutAt(),
-            attendance.getStatus()
-    )).toList();
+    return attendances.stream()
+        .map(
+            attendance ->
+                new AttendanceResponse(
+                    attendance.getId(),
+                    attendance.getUser().getId(),
+                    attendance.getUser().getName(),
+                    attendance.getWorkDate(),
+                    attendance.getClockInAt(),
+                    attendance.getClockOutAt(),
+                    attendance.getStatus()))
+        .toList();
   }
 
   @Transactional
-  public AttendanceResponse updateAttendance(Long id, Long farmId, Long userId, AttendanceUpdateCommand command) {
+  public AttendanceResponse updateAttendance(
+      Long id, Long farmId, Long userId, AttendanceUpdateCommand command) {
     farmRepository
-            .findByIdAndStatus(farmId, FarmStatus.ACTIVE)
-            .orElseThrow(() -> new FarmNotFoundException(farmId));
+        .findByIdAndStatus(farmId, FarmStatus.ACTIVE)
+        .orElseThrow(() -> new FarmNotFoundException(farmId));
 
     boolean isManageMember =
-            farmUserRepository.existsByFarmIdAndUserIdAndStatusAndPermissionKey(
-                    farmId, userId, FarmUserStatus.ACTIVE, PermissionKey.ATTENDANCE_MANAGE);
+        farmUserRepository.existsByFarmIdAndUserIdAndStatusAndPermissionKey(
+            farmId, userId, FarmUserStatus.ACTIVE, PermissionKey.ATTENDANCE_MANAGE);
     if (!isManageMember) {
       throw new MemberPermissionDeniedException();
     }
@@ -200,12 +212,16 @@ public class AttendanceService {
     validateAttendanceUpdate(command);
 
     Attendance attendance =
-        attendanceRepository.findByIdAndFarm_Id(id, farmId).orElseThrow(AttendanceNotFoundException::new);
+        attendanceRepository
+            .findByIdAndFarm_Id(id, farmId)
+            .orElseThrow(AttendanceNotFoundException::new);
 
-    User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
+    User user =
+        userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
     Instant adjustedAt = ZonedDateTime.now(DEFAULT_ZONE_ID).toInstant();
     Instant adjustedClockInAt = toInstant(command.clockInAt());
-    Instant adjustedClockOutAt = command.clockOutAt() == null ? null : toInstant(command.clockOutAt());
+    Instant adjustedClockOutAt =
+        command.clockOutAt() == null ? null : toInstant(command.clockOutAt());
 
     AttendanceAdjustment attendanceAdjustment =
         AttendanceAdjustment.create(
@@ -222,14 +238,13 @@ public class AttendanceService {
     attendance.adjust(adjustedClockInAt, adjustedClockOutAt, command.reason());
 
     return new AttendanceResponse(
-            attendance.getId(),
-            attendance.getUser().getId(),
-            attendance.getUser().getName(),
-            attendance.getWorkDate(),
-            attendance.getClockInAt(),
-            attendance.getClockOutAt(),
-            attendance.getStatus()
-    );
+        attendance.getId(),
+        attendance.getUser().getId(),
+        attendance.getUser().getName(),
+        attendance.getWorkDate(),
+        attendance.getClockInAt(),
+        attendance.getClockOutAt(),
+        attendance.getStatus());
   }
 
   private void validateAttendanceUpdate(AttendanceUpdateCommand command) {

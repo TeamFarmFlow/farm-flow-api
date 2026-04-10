@@ -33,3 +33,13 @@ permitAll인 패턴경로에 대하여
 
 - 내꺼 말고 다른 농장 전부 조회/수정/삭제 됨
 - 페이지 결과 조회 시 불필요한 Response 요소 제거(필수 : content, pageSize, totalCount)
+
+# 20260410
+
+- [ ] CultivationCycle CRUD
+- [ ] CultivationCycle 상태 전이
+- [ ] RoomReading CRUD
+- [ ] RoomReading 필터 조회
+- [ ] 환경 기록과 활성 사이클 자동 연결
+- [ ] 통합 조회 API
+- [ ] 테스트

@@ -8,12 +8,12 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class RoomRegisterRequest {
-    @NotBlank(message = "생육동 이름은 필수 입력값입니다.")
-    private String name;
+  @NotBlank(message = "생육동 이름은 필수 입력값입니다.")
+  private String name;
 
-    private String description;
+  private String description;
 
-    public RoomRegisterCommand toCommand(){
-        return new RoomRegisterCommand(name, description);
-    }
+  public RoomRegisterCommand toCommand() {
+    return new RoomRegisterCommand(name, description);
+  }
 }

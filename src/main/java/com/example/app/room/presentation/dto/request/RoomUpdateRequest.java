@@ -10,13 +10,15 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class RoomUpdateRequest {
-    @NotBlank(message = "생육동 이름은 필수 입력값입니다.")
-    private String name;
-    private String description;
-    @NotNull(message = "생육동 상태 설정은 필수 입력값입니다.")
-    private RoomStatus status;
+  @NotBlank(message = "생육동 이름은 필수 입력값입니다.")
+  private String name;
 
-    public RoomUpdateCommand toCommand(){
-        return new RoomUpdateCommand(name, description, status);
-    }
+  private String description;
+
+  @NotNull(message = "생육동 상태 설정은 필수 입력값입니다.")
+  private RoomStatus status;
+
+  public RoomUpdateCommand toCommand() {
+    return new RoomUpdateCommand(name, description, status);
+  }
 }

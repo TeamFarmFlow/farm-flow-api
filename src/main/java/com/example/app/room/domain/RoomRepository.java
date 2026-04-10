@@ -1,8 +1,8 @@
 package com.example.app.room.domain;
-import java.util.List;
-import java.util.Optional;
 
 import com.example.app.room.domain.enums.RoomStatus;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface RoomRepository extends JpaRepository<Room, Long> {

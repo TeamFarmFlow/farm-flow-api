@@ -1,9 +1,9 @@
 package com.example.app.attendance.presentation.dto.request;
 
 import com.example.app.attendance.application.command.AttendanceUpdateCommand;
-import java.time.LocalDateTime;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 

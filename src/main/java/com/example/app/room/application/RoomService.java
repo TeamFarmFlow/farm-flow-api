@@ -19,12 +19,11 @@ import com.example.app.room.domain.exception.InvalidRoomStatusException;
 import com.example.app.room.domain.exception.RoomNameAlreadyExistsException;
 import com.example.app.room.domain.exception.RoomNotFoundException;
 import com.example.app.room.presentation.dto.response.RoomResponse;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -85,7 +84,9 @@ public class RoomService {
     }
 
     Room room =
-        roomRepository.findByIdAndFarm_Id(id, farmId).orElseThrow(() -> new RoomNotFoundException(id));
+        roomRepository
+            .findByIdAndFarm_Id(id, farmId)
+            .orElseThrow(() -> new RoomNotFoundException(id));
     if (room.getStatus() == RoomStatus.DELETED) {
       throw new RoomNotFoundException(id);
     }
@@ -116,31 +117,37 @@ public class RoomService {
         roomRepository.findAllByFarm_IdAndStatusIn(
             farmId, List.of(RoomStatus.ACTIVE, RoomStatus.INACTIVE));
 
-    return rooms.stream().map(room -> new RoomResponse(
-            room.getId(),
-            room.getName(),
-            room.getDescription(),
-            room.getStatus(),
-            room.getCreatedAt(),
-            room.getUpdatedAt(),
-            room.getDeletedAt())).toList();
+    return rooms.stream()
+        .map(
+            room ->
+                new RoomResponse(
+                    room.getId(),
+                    room.getName(),
+                    room.getDescription(),
+                    room.getStatus(),
+                    room.getCreatedAt(),
+                    room.getUpdatedAt(),
+                    room.getDeletedAt()))
+        .toList();
   }
 
   @Transactional
   public RoomResponse updateRoom(Long farmId, Long id, RoomUpdateCommand command, Long userId) {
     farmRepository
-            .findByIdAndStatus(farmId, FarmStatus.ACTIVE)
-            .orElseThrow(() -> new FarmNotFoundException(farmId));
+        .findByIdAndStatus(farmId, FarmStatus.ACTIVE)
+        .orElseThrow(() -> new FarmNotFoundException(farmId));
 
     boolean isManageRoom =
-            farmUserRepository.existsByFarmIdAndUserIdAndStatusAndPermissionKey(
-                    farmId, userId, FarmUserStatus.ACTIVE, PermissionKey.ROOM_MANAGE);
+        farmUserRepository.existsByFarmIdAndUserIdAndStatusAndPermissionKey(
+            farmId, userId, FarmUserStatus.ACTIVE, PermissionKey.ROOM_MANAGE);
     if (!isManageRoom) {
       throw new MemberPermissionDeniedException();
     }
 
     Room room =
-            roomRepository.findByIdAndFarm_Id(id, farmId).orElseThrow(() -> new RoomNotFoundException(id));
+        roomRepository
+            .findByIdAndFarm_Id(id, farmId)
+            .orElseThrow(() -> new RoomNotFoundException(id));
     if (room.getStatus() == RoomStatus.DELETED) {
       throw new RoomNotFoundException(id);
     }
@@ -159,32 +166,34 @@ public class RoomService {
     room.update(command.name(), command.description(), command.status());
 
     return new RoomResponse(
-            room.getId(),
-            room.getName(),
-            room.getDescription(),
-            room.getStatus(),
-            room.getCreatedAt(),
-            room.getUpdatedAt(),
-            room.getDeletedAt());
+        room.getId(),
+        room.getName(),
+        room.getDescription(),
+        room.getStatus(),
+        room.getCreatedAt(),
+        room.getUpdatedAt(),
+        room.getDeletedAt());
   }
 
   @Transactional
   public void deleteRoom(Long id, Long farmId, Long userId) {
     farmRepository
-          .findByIdAndStatus(farmId, FarmStatus.ACTIVE)
-          .orElseThrow(() -> new FarmNotFoundException(farmId));
+        .findByIdAndStatus(farmId, FarmStatus.ACTIVE)
+        .orElseThrow(() -> new FarmNotFoundException(farmId));
 
     boolean isManageRoom =
-            farmUserRepository.existsByFarmIdAndUserIdAndStatusAndPermissionKey(
-                    farmId, userId, FarmUserStatus.ACTIVE, PermissionKey.ROOM_MANAGE);
+        farmUserRepository.existsByFarmIdAndUserIdAndStatusAndPermissionKey(
+            farmId, userId, FarmUserStatus.ACTIVE, PermissionKey.ROOM_MANAGE);
     if (!isManageRoom) {
       throw new MemberPermissionDeniedException();
     }
 
     Room room =
-            roomRepository.findByIdAndFarm_Id(id, farmId).orElseThrow(() -> new RoomNotFoundException(id));
+        roomRepository
+            .findByIdAndFarm_Id(id, farmId)
+            .orElseThrow(() -> new RoomNotFoundException(id));
 
-    if(room.getStatus().equals(RoomStatus.DELETED)) {
+    if (room.getStatus().equals(RoomStatus.DELETED)) {
       throw new AlreadyRoomDeletedException(id);
     }
 

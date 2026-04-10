@@ -1,8 +1,11 @@
 package com.example.app.room.domain;
 
+import com.example.app.cultivationCycle.domain.CultivationCycle;
 import com.example.app.farm.domain.Farm;
 import com.example.app.room.domain.enums.RoomStatus;
+import com.example.app.roomReading.domain.RoomReading;
 import com.example.app.shared.entity.BaseTimeEntity;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -14,9 +17,12 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -34,7 +40,9 @@ import lombok.NoArgsConstructor;
       @Index(name = "idx_room_farm_name", columnList = "farm_id,name")
     },
     uniqueConstraints = {
-      @UniqueConstraint(name = "uk_room_farm_name", columnNames = {"farm_id", "name"})
+      @UniqueConstraint(
+          name = "uk_room_farm_name",
+          columnNames = {"farm_id", "name"})
     })
 @Builder
 public class Room extends BaseTimeEntity {
@@ -58,6 +66,14 @@ public class Room extends BaseTimeEntity {
 
   @Column(name = "deleted_at")
   private Instant deletedAt;
+
+  @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
+  @Builder.Default
+  private List<CultivationCycle> cultivationCycles = new ArrayList<>();
+
+  @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
+  @Builder.Default
+  private List<RoomReading> roomReadings = new ArrayList<>();
 
   public static Room create(Farm farm, String name, String description) {
     return Room.builder()
