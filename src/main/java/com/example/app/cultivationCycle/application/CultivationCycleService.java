@@ -1,13 +1,12 @@
 package com.example.app.cultivationCycle.application;
 
+import com.example.app.cultivationCycle.application.command.CultivationCycleCompleteCommand;
+import com.example.app.cultivationCycle.application.command.CultivationCycleHarvestingCommand;
 import com.example.app.cultivationCycle.application.command.CultivationCycleMarkThinningCommand;
 import com.example.app.cultivationCycle.domain.CultivationCycle;
 import com.example.app.cultivationCycle.domain.CultivationCycleRepository;
 import com.example.app.cultivationCycle.domain.enums.CultivationCycleStatus;
-import com.example.app.cultivationCycle.domain.exception.AlreadyExistsCultivationCycleException;
-import com.example.app.cultivationCycle.domain.exception.CultivationCycleNotFoundException;
-import com.example.app.cultivationCycle.domain.exception.InvalidCultivationCycleRegisterStatusException;
-import com.example.app.cultivationCycle.domain.exception.InvalidMarkThinningException;
+import com.example.app.cultivationCycle.domain.exception.*;
 import com.example.app.cultivationCycle.presentation.dto.response.CultivationCycleResponse;
 import com.example.app.farm.domain.FarmRepository;
 import com.example.app.farm.domain.enums.FarmStatus;
@@ -99,7 +98,7 @@ public class CultivationCycleService {
   }
 
   public List<CultivationCycleResponse> getCultivationCycles(
-          Long farmId, Long roomId, Long userId) {
+      Long farmId, Long roomId, Long userId) {
     validateFarmExists(farmId);
     validateMember(farmId, userId);
 
@@ -113,36 +112,101 @@ public class CultivationCycleService {
         .toList();
   }
 
-    @Transactional
-    public CultivationCycleResponse markThinning(CultivationCycleMarkThinningCommand command, Long farmId, Long roomId, Long id, Long userId) {
-        validateFarmExists(farmId);
+  @Transactional
+  public CultivationCycleResponse markThinning(
+      CultivationCycleMarkThinningCommand command, Long farmId, Long roomId, Long id, Long userId) {
+    validateFarmExists(farmId);
 
-        Room room = getRoomOrThrow(farmId, roomId);
-        if (room.getStatus() != RoomStatus.ACTIVE) {
-            throw new InvalidCultivationCycleRegisterStatusException(room.getStatus());
-        }
-
-        boolean isManageCultivationCycle =
-                farmUserRepository.existsByFarmIdAndUserIdAndStatusAndPermissionKey(
-                        farmId, userId, FarmUserStatus.ACTIVE, PermissionKey.CYCLE_THINNING);
-        if (!isManageCultivationCycle) {
-            throw new MemberPermissionDeniedException();
-        }
-
-        CultivationCycle cultivationCycle =
-                cultivationCycleRepository
-                        .findByIdAndRoom_IdAndRoom_Farm_Id(id, roomId, farmId)
-                        .orElseThrow(() -> new CultivationCycleNotFoundException(id));
-
-        if(cultivationCycle.getStatus() != CultivationCycleStatus.IN_PROGRESS) {
-            throw new InvalidMarkThinningException();
-        }
-        ZonedDateTime now = ZonedDateTime.now(DEFAULT_ZONE_ID);
-        LocalDate date = now.toLocalDate();
-        cultivationCycle.setThinningDate(command.note(), date);
-
-        return toResponse(cultivationCycle, room);
+    Room room = getRoomOrThrow(farmId, roomId);
+    if (room.getStatus() != RoomStatus.ACTIVE) {
+      throw new InvalidCultivationCycleRegisterStatusException(room.getStatus());
     }
+
+    boolean isManageCultivationCycle =
+        farmUserRepository.existsByFarmIdAndUserIdAndStatusAndPermissionKey(
+            farmId, userId, FarmUserStatus.ACTIVE, PermissionKey.CYCLE_THINNING);
+    if (!isManageCultivationCycle) {
+      throw new MemberPermissionDeniedException();
+    }
+
+    CultivationCycle cultivationCycle =
+        cultivationCycleRepository
+            .findByIdAndRoom_IdAndRoom_Farm_Id(id, roomId, farmId)
+            .orElseThrow(() -> new CultivationCycleNotFoundException(id));
+
+    if (cultivationCycle.getStatus() != CultivationCycleStatus.IN_PROGRESS) {
+      throw new InvalidMarkThinningException();
+    }
+    ZonedDateTime now = ZonedDateTime.now(DEFAULT_ZONE_ID);
+    LocalDate date = now.toLocalDate();
+    cultivationCycle.setThinningDate(command.note(), date);
+
+    return toResponse(cultivationCycle, room);
+  }
+
+  @Transactional
+  public CultivationCycleResponse harvest(
+      Long farmId, Long roomId, Long userId, Long id, CultivationCycleHarvestingCommand command) {
+    validateFarmExists(farmId);
+
+    Room room = getRoomOrThrow(farmId, roomId);
+    if (room.getStatus() != RoomStatus.ACTIVE) {
+      throw new InvalidCultivationCycleRegisterStatusException(room.getStatus());
+    }
+
+    boolean isManageCultivationCycle =
+        farmUserRepository.existsByFarmIdAndUserIdAndStatusAndPermissionKey(
+            farmId, userId, FarmUserStatus.ACTIVE, PermissionKey.CYCLE_HARVEST);
+    if (!isManageCultivationCycle) {
+      throw new MemberPermissionDeniedException();
+    }
+
+    CultivationCycle cultivationCycle =
+        cultivationCycleRepository
+            .findByIdAndRoom_IdAndRoom_Farm_Id(id, roomId, farmId)
+            .orElseThrow(() -> new CultivationCycleNotFoundException(id));
+
+    if (cultivationCycle.getStatus() != CultivationCycleStatus.THINNED) {
+      throw new InvalidHarvestingException();
+    }
+    ZonedDateTime now = ZonedDateTime.now(DEFAULT_ZONE_ID);
+    LocalDate date = now.toLocalDate();
+    cultivationCycle.setHarvestStartDate(command.note(), date);
+
+    return toResponse(cultivationCycle, room);
+  }
+
+  @Transactional
+  public CultivationCycleResponse complete(
+      Long farmId, Long roomId, Long userId, Long id, CultivationCycleCompleteCommand command) {
+    validateFarmExists(farmId);
+
+    Room room = getRoomOrThrow(farmId, roomId);
+    if (room.getStatus() != RoomStatus.ACTIVE) {
+      throw new InvalidCultivationCycleRegisterStatusException(room.getStatus());
+    }
+
+    boolean isManageCultivationCycle =
+        farmUserRepository.existsByFarmIdAndUserIdAndStatusAndPermissionKey(
+            farmId, userId, FarmUserStatus.ACTIVE, PermissionKey.CYCLE_END);
+    if (!isManageCultivationCycle) {
+      throw new MemberPermissionDeniedException();
+    }
+
+    CultivationCycle cultivationCycle =
+        cultivationCycleRepository
+            .findByIdAndRoom_IdAndRoom_Farm_Id(id, roomId, farmId)
+            .orElseThrow(() -> new CultivationCycleNotFoundException(id));
+
+    if (cultivationCycle.getStatus() != CultivationCycleStatus.HARVESTING) {
+      throw new InvalidCompleteException();
+    }
+    ZonedDateTime now = ZonedDateTime.now(DEFAULT_ZONE_ID);
+    LocalDate date = now.toLocalDate();
+    cultivationCycle.setOutDate(command.note(), date);
+
+    return toResponse(cultivationCycle, room);
+  }
 
   private void validateFarmExists(Long farmId) {
     farmRepository

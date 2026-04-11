@@ -2,13 +2,14 @@ package com.example.app.cultivationCycle.presentation;
 
 import com.example.app.core.jwt.CustomUserDetails;
 import com.example.app.cultivationCycle.application.CultivationCycleService;
+import com.example.app.cultivationCycle.presentation.dto.request.CultivationCycleCompleteRequest;
+import com.example.app.cultivationCycle.presentation.dto.request.CultivationCycleHarvestingRequest;
 import com.example.app.cultivationCycle.presentation.dto.request.CultivationCycleMarkThinningRequest;
 import com.example.app.cultivationCycle.presentation.dto.response.CultivationCycleResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.List;
-
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -55,12 +56,40 @@ public class CultivationCycleController {
 
   @Operation(summary = "솎기 처리 ")
   @PatchMapping("/{id}/thinning")
-  public ResponseEntity<CultivationCycleResponse> markThinning(@PathVariable("farmId") Long farmId,
-                                                               @PathVariable("roomId") Long roomId,
-                                                               @PathVariable("id") Long id,
-                                                               @Valid @RequestBody CultivationCycleMarkThinningRequest request,
-                                                               Authentication authentication){
+  public ResponseEntity<CultivationCycleResponse> markThinning(
+      @PathVariable("farmId") Long farmId,
+      @PathVariable("roomId") Long roomId,
+      @PathVariable("id") Long id,
+      @Valid @RequestBody CultivationCycleMarkThinningRequest request,
+      Authentication authentication) {
     Long userId = ((CustomUserDetails) authentication.getPrincipal()).getId();
-    return ResponseEntity.ok(cultivationCycleService.markThinning(request.toCommand(), farmId, roomId, id, userId));
+    return ResponseEntity.ok(
+        cultivationCycleService.markThinning(request.toCommand(), farmId, roomId, id, userId));
+  }
+
+  @Operation(summary = "수확 처리")
+  @PatchMapping("/{id}/harvest-start")
+  public ResponseEntity<CultivationCycleResponse> harvest(
+      @PathVariable("farmId") Long farmId,
+      @PathVariable("roomId") Long roomId,
+      @PathVariable("id") Long id,
+      @Valid @RequestBody CultivationCycleHarvestingRequest request,
+      Authentication authentication) {
+    Long userId = ((CustomUserDetails) authentication.getPrincipal()).getId();
+    return ResponseEntity.ok(
+        cultivationCycleService.harvest(farmId, roomId, userId, id, request.toCommand()));
+  }
+
+  @Operation(summary = "퇴상 처리")
+  @PatchMapping("/{id}/complete")
+  public ResponseEntity<CultivationCycleResponse> complete(
+      @PathVariable("farmId") Long farmId,
+      @PathVariable("roomId") Long roomId,
+      @PathVariable("id") Long id,
+      @Valid @RequestBody CultivationCycleCompleteRequest request,
+      Authentication authentication) {
+    Long userId = ((CustomUserDetails) authentication.getPrincipal()).getId();
+    return ResponseEntity.ok(
+        cultivationCycleService.complete(farmId, roomId, userId, id, request.toCommand()));
   }
 }

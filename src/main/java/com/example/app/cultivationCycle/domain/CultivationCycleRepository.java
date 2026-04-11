@@ -4,7 +4,6 @@ import com.example.app.cultivationCycle.domain.enums.CultivationCycleStatus;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface CultivationCycleRepository extends JpaRepository<CultivationCycle, Long> {
@@ -12,6 +11,5 @@ public interface CultivationCycleRepository extends JpaRepository<CultivationCyc
 
   List<CultivationCycle> findAllByRoom_IdOrderByInDateDescIdDesc(Long roomId);
 
-  Optional<CultivationCycle> findByIdAndRoom_IdAndRoom_Farm_Id(
-      Long id, Long roomId, Long farmId);
+  Optional<CultivationCycle> findByIdAndRoom_IdAndRoom_Farm_Id(Long id, Long roomId, Long farmId);
 }

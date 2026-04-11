@@ -82,4 +82,16 @@ public class CultivationCycle extends BaseTimeEntity {
     this.note = note;
     this.thinningDate = date;
   }
+
+  public void setHarvestStartDate(String note, LocalDate date) {
+    this.status = CultivationCycleStatus.HARVESTING;
+    this.note = note;
+    this.harvestStartDate = date;
+  }
+
+  public void setOutDate(String note, LocalDate date) {
+    this.status = CultivationCycleStatus.COMPLETED;
+    this.note = note;
+    this.outDate = date;
+  }
 }
