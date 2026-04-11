@@ -68,4 +68,18 @@ public class CultivationCycle extends BaseTimeEntity {
   @OneToMany(mappedBy = "cultivationCycle")
   @Builder.Default
   private List<RoomReading> roomReadings = new ArrayList<>();
+
+  public static CultivationCycle create(Room room, LocalDate inDate) {
+    return CultivationCycle.builder()
+        .room(room)
+        .inDate(inDate)
+        .status(CultivationCycleStatus.IN_PROGRESS)
+        .build();
+  }
+
+  public void setThinningDate(String note, LocalDate date) {
+    this.status = CultivationCycleStatus.THINNED;
+    this.note = note;
+    this.thinningDate = date;
+  }
 }

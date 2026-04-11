@@ -16,7 +16,6 @@ public enum PermissionKey {
   CYCLE_THINNING,
   CYCLE_HARVEST,
   CYCLE_END,
-  CYCLE_READ,
 
   INVITE_MEMBER,
   MANAGE_MEMBERS,
