@@ -145,7 +145,7 @@ public class CultivationCycleService {
   }
 
   @Transactional
-  public CultivationCycleResponse harvest(
+  public CultivationCycleResponse markHarvestStart(
       Long farmId, Long roomId, Long userId, Long id, CultivationCycleHarvestingCommand command) {
     validateFarmExists(farmId);
 
@@ -208,6 +208,23 @@ public class CultivationCycleService {
     return toResponse(cultivationCycle, room);
   }
 
+  public CultivationCycleResponse getActiveCultivationCycles(Long farmId, Long roomId, Long userId) {
+      validateFarmExists(farmId);
+      validateMember(farmId, userId);
+
+      Room room = getRoomOrThrow(farmId, roomId);
+      if (room.getStatus() != RoomStatus.ACTIVE) {
+          throw new InvalidCultivationCycleRegisterStatusException(room.getStatus());
+      }
+
+      CultivationCycle cultivationCycle =
+              cultivationCycleRepository
+                      .findByRoom_IdAndRoom_Farm_IdAndStatusIn(roomId, farmId, ACTIVE_CYCLE_STATUSES)
+                      .orElseThrow(() -> new ActiveCultivationCycleNotFoundException(roomId));
+
+      return toResponse(cultivationCycle, room);
+  }
+
   private void validateFarmExists(Long farmId) {
     farmRepository
         .findByIdAndStatus(farmId, FarmStatus.ACTIVE)
@@ -248,4 +265,5 @@ public class CultivationCycleService {
         cultivationCycle.getStatus(),
         cultivationCycle.getNote());
   }
+
 }

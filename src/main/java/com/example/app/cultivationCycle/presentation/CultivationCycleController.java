@@ -69,7 +69,7 @@ public class CultivationCycleController {
 
   @Operation(summary = "수확 처리")
   @PatchMapping("/{id}/harvest-start")
-  public ResponseEntity<CultivationCycleResponse> harvest(
+  public ResponseEntity<CultivationCycleResponse> markHarvestStart(
       @PathVariable("farmId") Long farmId,
       @PathVariable("roomId") Long roomId,
       @PathVariable("id") Long id,
@@ -77,7 +77,7 @@ public class CultivationCycleController {
       Authentication authentication) {
     Long userId = ((CustomUserDetails) authentication.getPrincipal()).getId();
     return ResponseEntity.ok(
-        cultivationCycleService.harvest(farmId, roomId, userId, id, request.toCommand()));
+        cultivationCycleService.markHarvestStart(farmId, roomId, userId, id, request.toCommand()));
   }
 
   @Operation(summary = "퇴상 처리")
@@ -91,5 +91,15 @@ public class CultivationCycleController {
     Long userId = ((CustomUserDetails) authentication.getPrincipal()).getId();
     return ResponseEntity.ok(
         cultivationCycleService.complete(farmId, roomId, userId, id, request.toCommand()));
+  }
+
+  @Operation(summary = "생육동 활성 사이클 조회")
+  @GetMapping("/active")
+  public ResponseEntity<CultivationCycleResponse> getActiveCultivationCycles(
+          @PathVariable("farmId") Long farmId,
+          @PathVariable("roomId") Long roomId,
+          Authentication authentication){
+    Long userId = ((CustomUserDetails) authentication.getPrincipal()).getId();
+    return ResponseEntity.ok(cultivationCycleService.getActiveCultivationCycles(farmId, roomId, userId));
   }
 }
