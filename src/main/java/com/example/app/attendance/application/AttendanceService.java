@@ -12,13 +12,10 @@ import com.example.app.attendance.domain.exception.InvalidAttendanceAdjustmentRe
 import com.example.app.attendance.domain.exception.InvalidAttendanceDateRangeException;
 import com.example.app.attendance.domain.exception.InvalidAttendanceTimeRangeException;
 import com.example.app.attendance.presentation.dto.response.AttendanceResponse;
+import com.example.app.farm.application.FarmAccessValidator;
 import com.example.app.farm.domain.Farm;
-import com.example.app.farm.domain.FarmRepository;
-import com.example.app.farm.domain.enums.FarmStatus;
-import com.example.app.farm.domain.exception.FarmNotFoundException;
 import com.example.app.farmUser.domain.FarmUserRepository;
 import com.example.app.farmUser.domain.enums.FarmUserStatus;
-import com.example.app.farmUser.domain.exception.FarmUserNotFoundException;
 import com.example.app.farmUser.domain.exception.MemberPermissionDeniedException;
 import com.example.app.role.domain.enums.PermissionKey;
 import com.example.app.user.domain.User;
@@ -44,23 +41,14 @@ public class AttendanceService {
 
   private final AttendanceRepository attendanceRepository;
   private final AttendanceAdjustmentRepository attendanceAdjustmentRepository;
-  private final FarmRepository farmRepository;
+  private final FarmAccessValidator farmAccessValidator;
   private final FarmUserRepository farmUserRepository;
   private final UserRepository userRepository;
 
   @Transactional
   public AttendanceResponse clockIn(Long farmId, Long userId) {
-    Farm farm =
-        farmRepository
-            .findByIdAndStatus(farmId, FarmStatus.ACTIVE)
-            .orElseThrow(() -> new FarmNotFoundException(farmId));
-
-    boolean existsFarmUser =
-        farmUserRepository.existsByFarm_IdAndUser_IdAndStatus(
-            farmId, userId, FarmUserStatus.ACTIVE);
-    if (!existsFarmUser) {
-      throw new FarmUserNotFoundException(userId);
-    }
+    Farm farm = farmAccessValidator.getActiveFarm(farmId);
+    farmAccessValidator.validateActiveMember(farmId, userId);
 
     ZonedDateTime now = ZonedDateTime.now(DEFAULT_ZONE_ID);
     LocalDate workDate = now.toLocalDate();
@@ -90,16 +78,8 @@ public class AttendanceService {
 
   @Transactional
   public AttendanceResponse clockOut(Long farmId, Long userId) {
-    farmRepository
-        .findByIdAndStatus(farmId, FarmStatus.ACTIVE)
-        .orElseThrow(() -> new FarmNotFoundException(farmId));
-
-    boolean existsFarmUser =
-        farmUserRepository.existsByFarm_IdAndUser_IdAndStatus(
-            farmId, userId, FarmUserStatus.ACTIVE);
-    if (!existsFarmUser) {
-      throw new FarmUserNotFoundException(userId);
-    }
+    farmAccessValidator.validateActiveFarm(farmId);
+    farmAccessValidator.validateActiveMember(farmId, userId);
 
     ZonedDateTime now = ZonedDateTime.now(DEFAULT_ZONE_ID);
     LocalDate workDate = now.toLocalDate();
@@ -131,16 +111,8 @@ public class AttendanceService {
       throw new InvalidAttendanceDateRangeException();
     }
 
-    farmRepository
-        .findByIdAndStatus(farmId, FarmStatus.ACTIVE)
-        .orElseThrow(() -> new FarmNotFoundException(farmId));
-
-    boolean existsFarmUser =
-        farmUserRepository.existsByFarm_IdAndUser_IdAndStatus(
-            farmId, userId, FarmUserStatus.ACTIVE);
-    if (!existsFarmUser) {
-      throw new FarmUserNotFoundException(userId);
-    }
+    farmAccessValidator.validateActiveFarm(farmId);
+    farmAccessValidator.validateActiveMember(farmId, userId);
 
     List<Attendance> attendances =
         attendanceRepository.findAllByFarm_IdAndUser_IdAndWorkDateBetweenOrderByWorkDateDesc(
@@ -166,9 +138,7 @@ public class AttendanceService {
       throw new InvalidAttendanceDateRangeException();
     }
 
-    farmRepository
-        .findByIdAndStatus(farmId, FarmStatus.ACTIVE)
-        .orElseThrow(() -> new FarmNotFoundException(farmId));
+    farmAccessValidator.validateActiveFarm(farmId);
 
     boolean isManageMember =
         farmUserRepository.existsByFarmIdAndUserIdAndStatusAndPermissionKey(
@@ -198,9 +168,7 @@ public class AttendanceService {
   @Transactional
   public AttendanceResponse updateAttendance(
       Long id, Long farmId, Long userId, AttendanceUpdateCommand command) {
-    farmRepository
-        .findByIdAndStatus(farmId, FarmStatus.ACTIVE)
-        .orElseThrow(() -> new FarmNotFoundException(farmId));
+    farmAccessValidator.validateActiveFarm(farmId);
 
     boolean isManageMember =
         farmUserRepository.existsByFarmIdAndUserIdAndStatusAndPermissionKey(

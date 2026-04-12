@@ -8,12 +8,9 @@ import com.example.app.cultivationCycle.domain.CultivationCycleRepository;
 import com.example.app.cultivationCycle.domain.enums.CultivationCycleStatus;
 import com.example.app.cultivationCycle.domain.exception.*;
 import com.example.app.cultivationCycle.presentation.dto.response.CultivationCycleResponse;
-import com.example.app.farm.domain.FarmRepository;
-import com.example.app.farm.domain.enums.FarmStatus;
-import com.example.app.farm.domain.exception.FarmNotFoundException;
+import com.example.app.farm.application.FarmAccessValidator;
 import com.example.app.farmUser.domain.FarmUserRepository;
 import com.example.app.farmUser.domain.enums.FarmUserStatus;
-import com.example.app.farmUser.domain.exception.FarmUserNotFoundException;
 import com.example.app.farmUser.domain.exception.MemberPermissionDeniedException;
 import com.example.app.role.domain.enums.PermissionKey;
 import com.example.app.room.domain.Room;
@@ -40,13 +37,13 @@ public class CultivationCycleService {
           CultivationCycleStatus.HARVESTING);
 
   private final CultivationCycleRepository cultivationCycleRepository;
-  private final FarmRepository farmRepository;
+  private final FarmAccessValidator farmAccessValidator;
   private final RoomRepository roomRepository;
   private final FarmUserRepository farmUserRepository;
 
   @Transactional
   public CultivationCycleResponse register(Long farmId, Long roomId, Long userId) {
-    validateFarmExists(farmId);
+    farmAccessValidator.validateActiveFarm(farmId);
 
     Room room = getRoomOrThrow(farmId, roomId);
     if (room.getStatus() != RoomStatus.ACTIVE) {
@@ -85,8 +82,8 @@ public class CultivationCycleService {
   }
 
   public CultivationCycleResponse getCycle(Long id, Long farmId, Long roomId, Long userId) {
-    validateFarmExists(farmId);
-    validateMember(farmId, userId);
+    farmAccessValidator.validateActiveFarm(farmId);
+    farmAccessValidator.validateActiveMember(farmId, userId);
 
     Room room = getRoomOrThrow(farmId, roomId);
     CultivationCycle cultivationCycle =
@@ -99,8 +96,8 @@ public class CultivationCycleService {
 
   public List<CultivationCycleResponse> getCultivationCycles(
       Long farmId, Long roomId, Long userId) {
-    validateFarmExists(farmId);
-    validateMember(farmId, userId);
+    farmAccessValidator.validateActiveFarm(farmId);
+    farmAccessValidator.validateActiveMember(farmId, userId);
 
     Room room = getRoomOrThrow(farmId, roomId);
 
@@ -115,7 +112,7 @@ public class CultivationCycleService {
   @Transactional
   public CultivationCycleResponse markThinning(
       CultivationCycleMarkThinningCommand command, Long farmId, Long roomId, Long id, Long userId) {
-    validateFarmExists(farmId);
+    farmAccessValidator.validateActiveFarm(farmId);
 
     Room room = getRoomOrThrow(farmId, roomId);
     if (room.getStatus() != RoomStatus.ACTIVE) {
@@ -147,7 +144,7 @@ public class CultivationCycleService {
   @Transactional
   public CultivationCycleResponse markHarvestStart(
       Long farmId, Long roomId, Long userId, Long id, CultivationCycleHarvestingCommand command) {
-    validateFarmExists(farmId);
+    farmAccessValidator.validateActiveFarm(farmId);
 
     Room room = getRoomOrThrow(farmId, roomId);
     if (room.getStatus() != RoomStatus.ACTIVE) {
@@ -179,7 +176,7 @@ public class CultivationCycleService {
   @Transactional
   public CultivationCycleResponse complete(
       Long farmId, Long roomId, Long userId, Long id, CultivationCycleCompleteCommand command) {
-    validateFarmExists(farmId);
+    farmAccessValidator.validateActiveFarm(farmId);
 
     Room room = getRoomOrThrow(farmId, roomId);
     if (room.getStatus() != RoomStatus.ACTIVE) {
@@ -208,36 +205,22 @@ public class CultivationCycleService {
     return toResponse(cultivationCycle, room);
   }
 
-  public CultivationCycleResponse getActiveCultivationCycles(Long farmId, Long roomId, Long userId) {
-      validateFarmExists(farmId);
-      validateMember(farmId, userId);
+  public CultivationCycleResponse getActiveCultivationCycles(
+      Long farmId, Long roomId, Long userId) {
+    farmAccessValidator.validateActiveFarm(farmId);
+    farmAccessValidator.validateActiveMember(farmId, userId);
 
-      Room room = getRoomOrThrow(farmId, roomId);
-      if (room.getStatus() != RoomStatus.ACTIVE) {
-          throw new InvalidCultivationCycleRegisterStatusException(room.getStatus());
-      }
-
-      CultivationCycle cultivationCycle =
-              cultivationCycleRepository
-                      .findByRoom_IdAndRoom_Farm_IdAndStatusIn(roomId, farmId, ACTIVE_CYCLE_STATUSES)
-                      .orElseThrow(() -> new ActiveCultivationCycleNotFoundException(roomId));
-
-      return toResponse(cultivationCycle, room);
-  }
-
-  private void validateFarmExists(Long farmId) {
-    farmRepository
-        .findByIdAndStatus(farmId, FarmStatus.ACTIVE)
-        .orElseThrow(() -> new FarmNotFoundException(farmId));
-  }
-
-  private void validateMember(Long farmId, Long userId) {
-    boolean isMember =
-        farmUserRepository.existsByFarm_IdAndUser_IdAndStatus(
-            farmId, userId, FarmUserStatus.ACTIVE);
-    if (!isMember) {
-      throw new FarmUserNotFoundException(userId);
+    Room room = getRoomOrThrow(farmId, roomId);
+    if (room.getStatus() != RoomStatus.ACTIVE) {
+      throw new InvalidCultivationCycleRegisterStatusException(room.getStatus());
     }
+
+    CultivationCycle cultivationCycle =
+        cultivationCycleRepository
+            .findByRoom_IdAndRoom_Farm_IdAndStatusIn(roomId, farmId, ACTIVE_CYCLE_STATUSES)
+            .orElseThrow(() -> new ActiveCultivationCycleNotFoundException(roomId));
+
+    return toResponse(cultivationCycle, room);
   }
 
   private Room getRoomOrThrow(Long farmId, Long roomId) {
@@ -265,5 +248,4 @@ public class CultivationCycleService {
         cultivationCycle.getStatus(),
         cultivationCycle.getNote());
   }
-
 }

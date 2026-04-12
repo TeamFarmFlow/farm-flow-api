@@ -3,7 +3,6 @@ package com.example.app.roomReading.domain;
 import com.example.app.cultivationCycle.domain.CultivationCycle;
 import com.example.app.room.domain.Room;
 import com.example.app.shared.entity.BaseTimeEntity;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -13,12 +12,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -32,11 +28,10 @@ import lombok.NoArgsConstructor;
 @Table(
     name = "room_readings",
     indexes = {
-      @Index(name = "idx_room_reading_room_recorded_at", columnList = "room_id,recorded_at"),
       @Index(name = "idx_room_reading_room_created_at", columnList = "room_id,created_at"),
       @Index(
-          name = "idx_room_reading_cycle_recorded_at",
-          columnList = "cultivation_cycle_id,recorded_at")
+          name = "idx_room_reading_cycle_created_at",
+          columnList = "cultivation_cycle_id,created_at")
     })
 @Builder
 public class RoomReading extends BaseTimeEntity {
@@ -52,9 +47,6 @@ public class RoomReading extends BaseTimeEntity {
   @JoinColumn(name = "cultivation_cycle_id")
   private CultivationCycle cultivationCycle;
 
-  @Column(name = "recorded_at", nullable = false)
-  private LocalDateTime recordedAt;
-
   @Column(name = "temperature", nullable = false, precision = 5, scale = 2)
   private BigDecimal temperature;
 
@@ -67,7 +59,65 @@ public class RoomReading extends BaseTimeEntity {
   @Column(name = "memo", length = 500)
   private String memo;
 
-  @OneToMany(mappedBy = "roomReading", cascade = CascadeType.ALL, orphanRemoval = true)
-  @Builder.Default
-  private List<RoomReadingImage> images = new ArrayList<>();
+  public static RoomReading create(
+      Room room,
+      CultivationCycle cultivationCycle,
+      BigDecimal temperature,
+      BigDecimal humidity,
+      BigDecimal co2,
+      String memo) {
+    validateCultivationCycleRoom(room, cultivationCycle);
+
+    return RoomReading.builder()
+        .room(room)
+        .cultivationCycle(cultivationCycle)
+        .temperature(temperature)
+        .humidity(humidity)
+        .co2(co2)
+        .memo(normalizeMemo(memo))
+        .build();
+  }
+
+  public void update(
+      CultivationCycle cultivationCycle,
+      BigDecimal temperature,
+      BigDecimal humidity,
+      BigDecimal co2,
+      String memo) {
+    validateCultivationCycleRoom(this.room, cultivationCycle);
+
+    this.cultivationCycle = cultivationCycle;
+    this.temperature = temperature;
+    this.humidity = humidity;
+    this.co2 = co2;
+    this.memo = normalizeMemo(memo);
+  }
+
+  private static void validateCultivationCycleRoom(Room room, CultivationCycle cultivationCycle) {
+    if (cultivationCycle == null) {
+      return;
+    }
+
+    Long roomId = room.getId();
+    Long cultivationCycleRoomId = cultivationCycle.getRoom().getId();
+    if (roomId != null && cultivationCycleRoomId != null) {
+      if (!Objects.equals(roomId, cultivationCycleRoomId)) {
+        throw new IllegalArgumentException("Cultivation cycle does not belong to the room.");
+      }
+      return;
+    }
+
+    if (cultivationCycle.getRoom() != room) {
+      throw new IllegalArgumentException("Cultivation cycle does not belong to the room.");
+    }
+  }
+
+  private static String normalizeMemo(String memo) {
+    if (memo == null) {
+      return null;
+    }
+
+    String trimmedMemo = memo.trim();
+    return trimmedMemo.isEmpty() ? null : trimmedMemo;
+  }
 }

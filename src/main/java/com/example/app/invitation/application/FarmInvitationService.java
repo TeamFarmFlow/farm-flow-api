@@ -1,7 +1,8 @@
 package com.example.app.invitation.application;
 
+import com.example.app.farm.application.FarmAccessValidator;
 import com.example.app.farm.domain.*;
-import com.example.app.farm.domain.enums.FarmStatus;
+import com.example.app.farm.domain.FarmRepository;
 import com.example.app.farm.domain.exception.FarmNotFoundException;
 import com.example.app.farmUser.domain.FarmUser;
 import com.example.app.farmUser.domain.FarmUserId;
@@ -33,6 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class FarmInvitationService {
 
   private final FarmRepository farmRepository;
+  private final FarmAccessValidator farmAccessValidator;
   private final FarmUserRepository farmUserRepository;
   private final FarmInvitationRepository farmInvitationRepository;
   private final InvitationCodeService invitationCodeService;
@@ -42,10 +44,7 @@ public class FarmInvitationService {
 
   @Transactional
   public void createInvitation(FarmInvitationRegisterCommand command, Long farmId, Long userId) {
-    Farm farm =
-        farmRepository
-            .findByIdAndStatus(farmId, FarmStatus.ACTIVE)
-            .orElseThrow(() -> new FarmNotFoundException(farmId));
+    Farm farm = farmAccessValidator.getActiveFarm(farmId);
 
     User inviter =
         farmUserRepository
@@ -133,10 +132,7 @@ public class FarmInvitationService {
     }
 
     Long farmId = invitation.getFarm().getId();
-    Farm farm =
-        farmRepository
-            .findByIdAndStatus(farmId, FarmStatus.ACTIVE)
-            .orElseThrow(() -> new FarmNotFoundException(farmId));
+    Farm farm = farmAccessValidator.getActiveFarm(farmId);
 
     boolean alreadyMember = farmUserRepository.existsByFarm_IdAndUser_Id(farmId, userId);
     if (alreadyMember) {

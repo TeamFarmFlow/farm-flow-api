@@ -13,5 +13,6 @@ public interface CultivationCycleRepository extends JpaRepository<CultivationCyc
 
   Optional<CultivationCycle> findByIdAndRoom_IdAndRoom_Farm_Id(Long id, Long roomId, Long farmId);
 
-  Optional<CultivationCycle> findByRoom_IdAndRoom_Farm_IdAndStatusIn(Long roomId, Long farmId, List<CultivationCycleStatus> activeCycleStatuses);
+  Optional<CultivationCycle> findByRoom_IdAndRoom_Farm_IdAndStatusIn(
+      Long roomId, Long farmId, List<CultivationCycleStatus> activeCycleStatuses);
 }

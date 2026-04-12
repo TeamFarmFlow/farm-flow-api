@@ -1,12 +1,9 @@
 package com.example.app.room.application;
 
+import com.example.app.farm.application.FarmAccessValidator;
 import com.example.app.farm.domain.Farm;
-import com.example.app.farm.domain.FarmRepository;
-import com.example.app.farm.domain.enums.FarmStatus;
-import com.example.app.farm.domain.exception.FarmNotFoundException;
 import com.example.app.farmUser.domain.FarmUserRepository;
 import com.example.app.farmUser.domain.enums.FarmUserStatus;
-import com.example.app.farmUser.domain.exception.FarmUserNotFoundException;
 import com.example.app.farmUser.domain.exception.MemberPermissionDeniedException;
 import com.example.app.role.domain.enums.PermissionKey;
 import com.example.app.room.application.command.RoomRegisterCommand;
@@ -30,17 +27,14 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class RoomService {
   private final RoomRepository roomRepository;
-  private final FarmRepository farmRepository;
+  private final FarmAccessValidator farmAccessValidator;
   private final FarmUserRepository farmUserRepository;
 
   @Transactional
   public RoomResponse register(Long farmId, RoomRegisterCommand command, Long userId) {
     String normalizedName = command.name().trim();
 
-    Farm farm =
-        farmRepository
-            .findByIdAndStatus(farmId, FarmStatus.ACTIVE)
-            .orElseThrow(() -> new FarmNotFoundException(farmId));
+    Farm farm = farmAccessValidator.getActiveFarm(farmId);
 
     boolean isManageRoom =
         farmUserRepository.existsByFarmIdAndUserIdAndStatusAndPermissionKey(
@@ -72,16 +66,8 @@ public class RoomService {
   }
 
   public RoomResponse getRoom(Long farmId, Long userId, Long id) {
-    farmRepository
-        .findByIdAndStatus(farmId, FarmStatus.ACTIVE)
-        .orElseThrow(() -> new FarmNotFoundException(farmId));
-
-    boolean isMember =
-        farmUserRepository.existsByFarm_IdAndUser_IdAndStatus(
-            farmId, userId, FarmUserStatus.ACTIVE);
-    if (!isMember) {
-      throw new FarmUserNotFoundException(userId);
-    }
+    farmAccessValidator.validateActiveFarm(farmId);
+    farmAccessValidator.validateActiveMember(farmId, userId);
 
     Room room =
         roomRepository
@@ -102,16 +88,8 @@ public class RoomService {
   }
 
   public List<RoomResponse> getAllRooms(Long farmId, Long userId) {
-    farmRepository
-        .findByIdAndStatus(farmId, FarmStatus.ACTIVE)
-        .orElseThrow(() -> new FarmNotFoundException(farmId));
-
-    boolean isMember =
-        farmUserRepository.existsByFarm_IdAndUser_IdAndStatus(
-            farmId, userId, FarmUserStatus.ACTIVE);
-    if (!isMember) {
-      throw new FarmUserNotFoundException(userId);
-    }
+    farmAccessValidator.validateActiveFarm(farmId);
+    farmAccessValidator.validateActiveMember(farmId, userId);
 
     List<Room> rooms =
         roomRepository.findAllByFarm_IdAndStatusIn(
@@ -133,9 +111,7 @@ public class RoomService {
 
   @Transactional
   public RoomResponse updateRoom(Long farmId, Long id, RoomUpdateCommand command, Long userId) {
-    farmRepository
-        .findByIdAndStatus(farmId, FarmStatus.ACTIVE)
-        .orElseThrow(() -> new FarmNotFoundException(farmId));
+    farmAccessValidator.validateActiveFarm(farmId);
 
     boolean isManageRoom =
         farmUserRepository.existsByFarmIdAndUserIdAndStatusAndPermissionKey(
@@ -177,9 +153,7 @@ public class RoomService {
 
   @Transactional
   public void deleteRoom(Long id, Long farmId, Long userId) {
-    farmRepository
-        .findByIdAndStatus(farmId, FarmStatus.ACTIVE)
-        .orElseThrow(() -> new FarmNotFoundException(farmId));
+    farmAccessValidator.validateActiveFarm(farmId);
 
     boolean isManageRoom =
         farmUserRepository.existsByFarmIdAndUserIdAndStatusAndPermissionKey(

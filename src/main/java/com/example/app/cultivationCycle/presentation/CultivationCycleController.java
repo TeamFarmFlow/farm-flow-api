@@ -96,10 +96,11 @@ public class CultivationCycleController {
   @Operation(summary = "생육동 활성 사이클 조회")
   @GetMapping("/active")
   public ResponseEntity<CultivationCycleResponse> getActiveCultivationCycles(
-          @PathVariable("farmId") Long farmId,
-          @PathVariable("roomId") Long roomId,
-          Authentication authentication){
+      @PathVariable("farmId") Long farmId,
+      @PathVariable("roomId") Long roomId,
+      Authentication authentication) {
     Long userId = ((CustomUserDetails) authentication.getPrincipal()).getId();
-    return ResponseEntity.ok(cultivationCycleService.getActiveCultivationCycles(farmId, roomId, userId));
+    return ResponseEntity.ok(
+        cultivationCycleService.getActiveCultivationCycles(farmId, roomId, userId));
   }
 }
