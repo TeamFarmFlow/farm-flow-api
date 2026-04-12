@@ -6,7 +6,13 @@ import com.example.app.cultivationCycle.application.command.CultivationCycleMark
 import com.example.app.cultivationCycle.domain.CultivationCycle;
 import com.example.app.cultivationCycle.domain.CultivationCycleRepository;
 import com.example.app.cultivationCycle.domain.enums.CultivationCycleStatus;
-import com.example.app.cultivationCycle.domain.exception.*;
+import com.example.app.cultivationCycle.domain.exception.ActiveCultivationCycleNotFoundException;
+import com.example.app.cultivationCycle.domain.exception.AlreadyExistsCultivationCycleException;
+import com.example.app.cultivationCycle.domain.exception.CultivationCycleNotFoundException;
+import com.example.app.cultivationCycle.domain.exception.InvalidCompleteException;
+import com.example.app.cultivationCycle.domain.exception.InvalidCultivationCycleRegisterStatusException;
+import com.example.app.cultivationCycle.domain.exception.InvalidHarvestingException;
+import com.example.app.cultivationCycle.domain.exception.InvalidMarkThinningException;
 import com.example.app.cultivationCycle.presentation.dto.response.CultivationCycleResponse;
 import com.example.app.farm.application.FarmAccessValidator;
 import com.example.app.farmUser.domain.FarmUserRepository;
@@ -17,9 +23,12 @@ import com.example.app.room.domain.Room;
 import com.example.app.room.domain.RoomRepository;
 import com.example.app.room.domain.enums.RoomStatus;
 import com.example.app.room.domain.exception.RoomNotFoundException;
+import com.example.app.roomReading.domain.RoomReading;
+import com.example.app.roomReading.presentation.dto.response.RoomReadingResponse;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.Collections;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -69,16 +78,7 @@ public class CultivationCycleService {
     CultivationCycle cultivationCycle = CultivationCycle.create(room, inDate);
     cultivationCycleRepository.save(cultivationCycle);
 
-    return new CultivationCycleResponse(
-        cultivationCycle.getId(),
-        room.getId(),
-        room.getName(),
-        cultivationCycle.getInDate(),
-        cultivationCycle.getThinningDate(),
-        cultivationCycle.getHarvestStartDate(),
-        cultivationCycle.getOutDate(),
-        cultivationCycle.getStatus(),
-        cultivationCycle.getNote());
+    return toResponse(cultivationCycle, room, false);
   }
 
   public CultivationCycleResponse getCycle(Long id, Long farmId, Long roomId, Long userId) {
@@ -91,7 +91,7 @@ public class CultivationCycleService {
             .findByIdAndRoom_IdAndRoom_Farm_Id(id, roomId, farmId)
             .orElseThrow(() -> new CultivationCycleNotFoundException(id));
 
-    return toResponse(cultivationCycle, room);
+    return toResponse(cultivationCycle, room, true);
   }
 
   public List<CultivationCycleResponse> getCultivationCycles(
@@ -105,7 +105,7 @@ public class CultivationCycleService {
         cultivationCycleRepository.findAllByRoom_IdOrderByInDateDescIdDesc(roomId);
 
     return cultivationCycles.stream()
-        .map(cultivationCycle -> toResponse(cultivationCycle, room))
+        .map(cultivationCycle -> toResponse(cultivationCycle, room, false))
         .toList();
   }
 
@@ -134,11 +134,12 @@ public class CultivationCycleService {
     if (cultivationCycle.getStatus() != CultivationCycleStatus.IN_PROGRESS) {
       throw new InvalidMarkThinningException();
     }
+
     ZonedDateTime now = ZonedDateTime.now(DEFAULT_ZONE_ID);
     LocalDate date = now.toLocalDate();
     cultivationCycle.setThinningDate(command.note(), date);
 
-    return toResponse(cultivationCycle, room);
+    return toResponse(cultivationCycle, room, false);
   }
 
   @Transactional
@@ -166,11 +167,12 @@ public class CultivationCycleService {
     if (cultivationCycle.getStatus() != CultivationCycleStatus.THINNED) {
       throw new InvalidHarvestingException();
     }
+
     ZonedDateTime now = ZonedDateTime.now(DEFAULT_ZONE_ID);
     LocalDate date = now.toLocalDate();
     cultivationCycle.setHarvestStartDate(command.note(), date);
 
-    return toResponse(cultivationCycle, room);
+    return toResponse(cultivationCycle, room, false);
   }
 
   @Transactional
@@ -198,11 +200,12 @@ public class CultivationCycleService {
     if (cultivationCycle.getStatus() != CultivationCycleStatus.HARVESTING) {
       throw new InvalidCompleteException();
     }
+
     ZonedDateTime now = ZonedDateTime.now(DEFAULT_ZONE_ID);
     LocalDate date = now.toLocalDate();
     cultivationCycle.setOutDate(command.note(), date);
 
-    return toResponse(cultivationCycle, room);
+    return toResponse(cultivationCycle, room, false);
   }
 
   public CultivationCycleResponse getActiveCultivationCycles(
@@ -220,7 +223,7 @@ public class CultivationCycleService {
             .findByRoom_IdAndRoom_Farm_IdAndStatusIn(roomId, farmId, ACTIVE_CYCLE_STATUSES)
             .orElseThrow(() -> new ActiveCultivationCycleNotFoundException(roomId));
 
-    return toResponse(cultivationCycle, room);
+    return toResponse(cultivationCycle, room, false);
   }
 
   private Room getRoomOrThrow(Long farmId, Long roomId) {
@@ -236,7 +239,8 @@ public class CultivationCycleService {
     return room;
   }
 
-  private CultivationCycleResponse toResponse(CultivationCycle cultivationCycle, Room room) {
+  private CultivationCycleResponse toResponse(
+      CultivationCycle cultivationCycle, Room room, boolean includeRoomReadings) {
     return new CultivationCycleResponse(
         cultivationCycle.getId(),
         room.getId(),
@@ -246,6 +250,20 @@ public class CultivationCycleService {
         cultivationCycle.getHarvestStartDate(),
         cultivationCycle.getOutDate(),
         cultivationCycle.getStatus(),
-        cultivationCycle.getNote());
+        cultivationCycle.getNote(),
+        includeRoomReadings
+            ? cultivationCycle.getRoomReadings().stream().map(this::toRoomReadingResponse).toList()
+            : Collections.emptyList());
+  }
+
+  private RoomReadingResponse toRoomReadingResponse(RoomReading roomReading) {
+    return new RoomReadingResponse(
+        roomReading.getId(),
+        roomReading.getRoom().getId(),
+        roomReading.getCreatedAt(),
+        roomReading.getTemperature(),
+        roomReading.getHumidity(),
+        roomReading.getCo2(),
+        roomReading.getMemo());
   }
 }
