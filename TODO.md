@@ -36,10 +36,10 @@ permitAll인 패턴경로에 대하여
 
 # 20260410
 
-- [ ] CultivationCycle CRUD
-- [ ] CultivationCycle 상태 전이
-- [ ] RoomReading CRUD
-- [ ] RoomReading 필터 조회
-- [ ] 환경 기록과 활성 사이클 자동 연결
+- [x] CultivationCycle CRUD
+- [x] CultivationCycle 상태 전이
+- [x] RoomReading CRUD
+- [x] RoomReading 필터 조회
+- [x] 환경 기록과 활성 사이클 자동 연결
 - [ ] 통합 조회 API
 - [ ] 테스트

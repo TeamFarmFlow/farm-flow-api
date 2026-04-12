@@ -20,6 +20,9 @@ import com.example.app.roomReading.domain.RoomReading;
 import com.example.app.roomReading.domain.RoomReadingRepository;
 import com.example.app.roomReading.domain.exception.RoomReadingNotFoundException;
 import com.example.app.roomReading.presentation.dto.response.RoomReadingResponse;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -29,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class RoomReadingService {
+  private static final ZoneId DEFAULT_ZONE_ID = ZoneId.of("Asia/Seoul");
   private static final List<CultivationCycleStatus> ACTIVE_CYCLE_STATUSES =
       List.of(
           CultivationCycleStatus.IN_PROGRESS,
@@ -77,38 +81,20 @@ public class RoomReadingService {
 
     roomReadingRepository.save(roomReading);
 
-    return new RoomReadingResponse(
-        roomReading.getId(),
-        roomReading.getCreatedAt(),
-        roomReading.getTemperature(),
-        roomReading.getHumidity(),
-        roomReading.getCo2(),
-        roomReading.getMemo());
+    return toResponse(roomReading);
   }
 
   public RoomReadingResponse getRoomReading(Long id, Long farmId, Long roomId, Long userId) {
     farmAccessValidator.validateActiveFarm(farmId);
     farmAccessValidator.validateActiveMember(farmId, userId);
-    Room room =
-        roomRepository
-            .findByIdAndFarm_Id(roomId, farmId)
-            .orElseThrow(() -> new RoomNotFoundException(roomId));
-    if (room.getStatus() == RoomStatus.DELETED) {
-      throw new InvalidRoomStatusException();
-    }
+    validateReadableRoomOrThrow(farmId, roomId);
 
     RoomReading roomReading =
         roomReadingRepository
             .findByIdAndRoom_Id(id, roomId)
             .orElseThrow(() -> new RoomReadingNotFoundException(id));
 
-    return new RoomReadingResponse(
-        roomReading.getId(),
-        roomReading.getCreatedAt(),
-        roomReading.getTemperature(),
-        roomReading.getHumidity(),
-        roomReading.getCo2(),
-        roomReading.getMemo());
+    return toResponse(roomReading);
   }
 
   @Transactional
@@ -174,8 +160,46 @@ public class RoomReadingService {
     roomReading.update(
         cycle, command.temperature(), command.humidity(), command.co2(), command.memo());
 
+    return toResponse(roomReading);
+  }
+
+  public List<RoomReadingResponse> getRoomReadings(
+      Long farmId, Long userId, Long roomId, LocalDate from, LocalDate to) {
+    farmAccessValidator.validateActiveFarm(farmId);
+    farmAccessValidator.validateActiveMember(farmId, userId);
+
+    if (from != null && to != null && from.isAfter(to)) {
+      throw new IllegalArgumentException("From date must be on or before to date.");
+    }
+
+    if (roomId != null) {
+      validateReadableRoomOrThrow(farmId, roomId);
+    }
+
+    Instant fromInstant = from == null ? null : from.atStartOfDay(DEFAULT_ZONE_ID).toInstant();
+    Instant toExclusive =
+        to == null ? null : to.plusDays(1).atStartOfDay(DEFAULT_ZONE_ID).toInstant();
+
+    return roomReadingRepository.findAllByFilter(farmId, roomId, fromInstant, toExclusive).stream()
+        .map(this::toResponse)
+        .toList();
+  }
+
+  private void validateReadableRoomOrThrow(Long farmId, Long roomId) {
+    Room room =
+        roomRepository
+            .findByIdAndFarm_Id(roomId, farmId)
+            .orElseThrow(() -> new RoomNotFoundException(roomId));
+
+    if (room.getStatus() == RoomStatus.DELETED) {
+      throw new RoomNotFoundException(roomId);
+    }
+  }
+
+  private RoomReadingResponse toResponse(RoomReading roomReading) {
     return new RoomReadingResponse(
         roomReading.getId(),
+        roomReading.getRoom().getId(),
         roomReading.getCreatedAt(),
         roomReading.getTemperature(),
         roomReading.getHumidity(),

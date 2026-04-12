@@ -5,6 +5,7 @@ import java.time.Instant;
 
 public record RoomReadingResponse(
     Long id,
+    Long roomId,
     Instant createdAt,
     BigDecimal temperature,
     BigDecimal humidity,
